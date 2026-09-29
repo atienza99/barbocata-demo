@@ -257,8 +257,9 @@
     background:linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(10,8,6,.55) 100%);
     pointer-events:none;
   }
-  .pin-flip-icon{
+  .pin-tile-front img.pin-flip-icon{
     position:absolute; top:8px; right:8px; width:22px; height:22px;
+    object-fit:contain; transition:none;
     filter:drop-shadow(0 1px 3px rgba(0,0,0,.65)) drop-shadow(0 0 2px rgba(0,0,0,.5));
     pointer-events:none; z-index:2;
   }
