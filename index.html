@@ -352,73 +352,6 @@
     .brand-row{ padding-top:calc(14px + env(safe-area-inset-top,0px)); }
   }
 
-  .lightbox{
-    position:fixed; inset:0; background:rgba(10,8,6,.82);
-    display:none; align-items:flex-end; justify-content:center; z-index:50;
-  }
-  .lightbox.open{display:flex;}
-  .lb-card{
-    background:var(--card-dark); color:var(--on-dark); width:100%; max-width:520px;
-    border-radius:20px 20px 0 0; padding:0 0 26px; max-height:82vh; overflow:auto;
-  }
-  .lb-body{ padding:18px 22px 0; }
-  .lb-body h3{ margin:0 0 6px; font-size:22px; color:var(--on-dark); }
-  .lb-body p{ margin:0 0 14px; font-size:13.5px; color:var(--on-dark-dim); line-height:1.5; }
-  .lb-close{ display:block; margin:0 auto; background:var(--rust); color:var(--white); border:none; padding:10px 22px; border-radius:999px; font:500 13px 'Inter',sans-serif; cursor:pointer; }
-
-  /* ---- visor 3D del plato ---- */
-  .viewer3d{
-    position:relative; height:230px;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(180deg,#2E2216,#1C140D);
-    border-radius:20px 20px 0 0; perspective:900px;
-    touch-action:pan-y; cursor:grab; overflow:hidden; user-select:none;
-  }
-  .viewer3d:active{ cursor:grabbing; }
-  .viewer-badge{
-    position:absolute; top:12px; left:14px; z-index:3;
-    background:rgba(245,239,227,.14); color:var(--on-dark);
-    font:600 10px 'Inter',sans-serif; letter-spacing:.03em;
-    padding:4px 9px; border-radius:999px;
-  }
-  .viewer-hint{
-    position:absolute; bottom:9px; left:0; right:0; text-align:center;
-    font-size:10.5px; color:var(--on-dark-dim); font-weight:500;
-  }
-  .plate-tilt{ width:148px; height:148px; transform-style:preserve-3d; transform:rotateX(56deg); }
-  .plate-shadow{
-    position:absolute; width:148px; height:148px; border-radius:50%;
-    background:radial-gradient(ellipse at center, rgba(0,0,0,.5), transparent 68%);
-    transform:translateZ(-30px) scale(1.15); filter:blur(2px);
-  }
-  .plate-spin{
-    position:relative; width:100%; height:100%; border-radius:50%;
-    background:radial-gradient(circle at 36% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%), var(--plate-bg,#eee);
-    box-shadow:inset 0 -12px 18px rgba(0,0,0,.1), inset 0 6px 10px rgba(255,255,255,.55), 0 4px 10px rgba(0,0,0,.15);
-    transform:rotateZ(var(--spin,0deg));
-  }
-  .plate-food{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:52px; }
-  .garnish{ position:absolute; font-size:17px; }
-
-  /* ---- visor con fotos reales (4 ángulos) ---- */
-  .photo-disc-wrap{ display:none; position:relative; width:172px; height:172px; }
-  .photo-disc-wrap.active{ display:block; }
-  .photo-disc-shadow{
-    position:absolute; left:50%; bottom:-14px; width:150px; height:32px;
-    transform:translateX(-50%); border-radius:50%;
-    background:radial-gradient(ellipse at center, rgba(0,0,0,.55), transparent 72%);
-    filter:blur(3px);
-  }
-  .photo-disc{
-    position:relative; width:100%; height:100%; border-radius:50%; overflow:hidden;
-    box-shadow:0 4px 0 rgba(0,0,0,.12), 0 0 0 4px rgba(245,239,227,.08), 0 18px 26px -12px rgba(0,0,0,.6);
-  }
-  .photo-frame{
-    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-    opacity:0; transition:opacity .16s ease; pointer-events:none;
-  }
-  .photo-frame.visible{ opacity:1; }
-  .g1{ top:18%; left:62%; } .g2{ top:60%; left:24%; } .g3{ top:66%; left:66%; font-size:13px; }
 
   /* =================== PANEL RESTAURANTE =================== */
   .panel{ background:var(--white); }
@@ -528,39 +461,6 @@
   </div>
 </section>
 
-<div class="lightbox" id="lightbox">
-  <div class="lb-card">
-    <div class="viewer3d" id="viewer3d">
-      <span class="viewer-badge" id="viewerBadge">360° · 4 fotos</span>
-      <div class="plate-tilt" id="plateTiltWrap">
-        <div class="plate-shadow"></div>
-        <div class="plate-spin" id="plateSpin">
-          <div class="plate-food" id="plateFood">🍝</div>
-          <span class="garnish g1" id="g1">🌿</span>
-          <span class="garnish g2" id="g2">🍅</span>
-          <span class="garnish g3" id="g3">✨</span>
-        </div>
-      </div>
-      <div class="photo-disc-wrap" id="photoDiscWrap">
-        <div class="photo-disc-shadow"></div>
-        <div class="photo-disc">
-          <img class="photo-frame" data-i="0">
-          <img class="photo-frame" data-i="1">
-          <img class="photo-frame" data-i="2">
-          <img class="photo-frame" data-i="3">
-        </div>
-      </div>
-      <span class="viewer-hint" id="viewerHint">Arrastra para girar el plato</span>
-    </div>
-    <div class="lb-body">
-      <h3 id="lbName"></h3>
-      <p id="lbDesc"></p>
-      <div class="allergens" id="lbAllergens"></div>
-      <button class="lb-close" id="lbCloseBtn" onclick="closeLightbox()">Cerrar</button>
-    </div>
-  </div>
-</div>
-
 <div class="sheet-overlay" id="filterSheet">
   <div class="sheet-card">
     <h3 id="dietTitle">Preferencias</h3>
@@ -614,9 +514,9 @@
 <script>
 let lang = 'es';
 const i18n = {
-  es:{ filterBtn:'Filtrar', navHome:'Inicio', navMenu:'Carta', navOrder:'Pedido', navProfile:'Perfil', filterTitle:'Filtrar por alérgenos', filterSub:'Oculta de la carta los platos que contengan lo que marques', dietTitle:'Preferencias', dietSub:'Muestra solo los platos que cumplan lo que marques', clear:'Limpiar', apply:'Aplicar filtros', without:'Sin', viewerBadge:'360° · 4 fotos', viewerBadgeGeneric:'Vista previa', viewerHint:'Arrastra para girar el plato', close:'Cerrar', noMatch:'Ningún plato de esta categoría cumple los filtros que has puesto 🙁', noAllergens:'✅ Sin alérgenos comunes' },
-  ca:{ filterBtn:'Filtra', navHome:'Inici', navMenu:'Carta', navOrder:'Comanda', navProfile:'Perfil', filterTitle:'Filtra per al·lèrgens', filterSub:'Amaga de la carta els plats que continguin el que marquis', dietTitle:'Preferències', dietSub:'Mostra només els plats que compleixin el que marquis', clear:'Neteja', apply:'Aplica els filtres', without:'Sense', viewerBadge:'360° · 4 fotos', viewerBadgeGeneric:'Vista prèvia', viewerHint:'Arrossega per girar el plat', close:'Tanca', noMatch:"Cap plat d'aquesta categoria compleix els filtres que has posat 🙁", noAllergens:'✅ Sense al·lèrgens comuns' },
-  en:{ filterBtn:'Filter', navHome:'Home', navMenu:'Menu', navOrder:'Order', navProfile:'Profile', filterTitle:'Filter by allergens', filterSub:'Hide dishes from the menu that contain what you select', dietTitle:'Preferences', dietSub:'Show only dishes that match what you select', clear:'Clear', apply:'Apply filters', without:'No', viewerBadge:'360° · 4 photos', viewerBadgeGeneric:'Preview', viewerHint:'Drag to rotate the dish', close:'Close', noMatch:'No dish in this category matches your filters 🙁', noAllergens:'✅ No common allergens' },
+  es:{ filterBtn:'Filtrar', navHome:'Inicio', navMenu:'Carta', navOrder:'Pedido', navProfile:'Perfil', filterTitle:'Filtrar por alérgenos', filterSub:'Oculta de la carta los platos que contengan lo que marques', dietTitle:'Preferencias', dietSub:'Muestra solo los platos que cumplan lo que marques', clear:'Limpiar', apply:'Aplicar filtros', without:'Sin', noMatch:'Ningún plato de esta categoría cumple los filtros que has puesto 🙁' },
+  ca:{ filterBtn:'Filtra', navHome:'Inici', navMenu:'Carta', navOrder:'Comanda', navProfile:'Perfil', filterTitle:'Filtra per al·lèrgens', filterSub:'Amaga de la carta els plats que continguin el que marquis', dietTitle:'Preferències', dietSub:'Mostra només els plats que compleixin el que marquis', clear:'Neteja', apply:'Aplica els filtres', without:'Sense', noMatch:"Cap plat d'aquesta categoria compleix els filtres que has posat 🙁" },
+  en:{ filterBtn:'Filter', navHome:'Home', navMenu:'Menu', navOrder:'Order', navProfile:'Profile', filterTitle:'Filter by allergens', filterSub:'Hide dishes from the menu that contain what you select', dietTitle:'Preferences', dietSub:'Show only dishes that match what you select', clear:'Clear', apply:'Apply filters', without:'No', noMatch:'No dish in this category matches your filters 🙁' },
 };
 const allergenMeta = {
   gluten:{icon:'🌾', es:'Gluten', ca:'Gluten', en:'Gluten'},
@@ -760,9 +660,6 @@ function updateStaticText(){
   document.getElementById('dietSub').textContent = t.dietSub;
   document.getElementById('btnClear').textContent = t.clear;
   document.getElementById('btnApply').textContent = t.apply;
-  document.getElementById('viewerBadge').textContent = t.viewerBadge;
-  document.getElementById('viewerHint').textContent = t.viewerHint;
-  document.getElementById('lbCloseBtn').textContent = t.close;
 }
 
 let activeFilters = new Set();
@@ -773,17 +670,9 @@ function allPinDishes(){
   );
 }
 let selectedPinCat = 'all';
-let selectedBebSub = 'all';
-const bebSubMeta = {
-  vino:{icon:'🍷', es:'Vinos', ca:'Vins', en:'Wines'},
-  refresco:{icon:'🥤', es:'Refrescos', ca:'Refrescos', en:'Soft drinks'},
-  agua:{icon:'💧', es:'Aguas', ca:'Aigües', en:'Waters'},
-  otros:{icon:'🍹', es:'Otros', ca:'Altres', en:'Other'},
-};
 function filteredPinDishes(){
   return allPinDishes().filter(d =>
     (selectedPinCat === 'all' || d._cat === selectedPinCat) &&
-    (selectedPinCat !== 'bebidas' || selectedBebSub === 'all' || d.sub === selectedBebSub) &&
     !(d.allergens||[]).some(a => activeFilters.has(a)) &&
     [...activeDiet].every(k => (d.diet||[]).includes(k))
   );
@@ -802,35 +691,10 @@ function renderCatTabs(){
     btn.textContent = o.label;
     btn.onclick = ()=>{
       selectedPinCat = o.key;
-      selectedBebSub = 'all';
       renderCatTabs();
-      renderBebSubTabs();
       renderPinGrid();
     };
     wrap.appendChild(btn);
-  });
-  renderBebSubTabs();
-}
-function renderBebSubTabs(){
-  const wrap = document.getElementById('pinBebSubTabs');
-  if(!wrap) return;
-  if(selectedPinCat !== 'bebidas'){
-    wrap.innerHTML = '';
-    wrap.style.display = 'none';
-    return;
-  }
-  wrap.style.display = '';
-  wrap.innerHTML = '';
-  const allLabel = {es:'Todas', ca:'Totes', en:'All'}[lang];
-  const opts = [{key:'all', label:allLabel, icon:'🍽️'}].concat(
-    Object.entries(bebSubMeta).map(([key,m]) => ({key, label:m[lang], icon:m.icon}))
-  );
-  opts.forEach(o=>{
-    const chip = document.createElement('div');
-    chip.className = 'pin-qf-chip' + (selectedBebSub === o.key ? ' active' : '');
-    chip.innerHTML = `${o.icon} ${o.label}`;
-    chip.onclick = ()=>{ selectedBebSub = o.key; renderBebSubTabs(); renderPinGrid(); };
-    wrap.appendChild(chip);
   });
 }
 
@@ -1031,58 +895,6 @@ function applyFilters(){
 }
 document.getElementById('filterSheet').addEventListener('click', e=>{ if(e.target.id==='filterSheet') closeFilterSheet(); });
 
-let spin = 0, dragging = false, startX = 0, startSpin = 0, idleTimer = null, currentPhotos = null;
-const plateSpin = document.getElementById('plateSpin');
-const photoFrames = Array.from(document.querySelectorAll('.photo-frame'));
-function setSpin(deg){
-  spin = deg;
-  plateSpin.style.setProperty('--spin', deg + 'deg');
-  if(currentPhotos){
-    const norm = ((deg % 360) + 360) % 360;
-    const idx = Math.floor(norm / 90) % 4;
-    photoFrames.forEach((img,i)=> img.classList.toggle('visible', i === idx));
-  }
-}
-function startIdleSpin(){
-  stopIdleSpin();
-  idleTimer = setInterval(()=>{ if(!dragging) setSpin(spin + 0.35); }, 30);
-}
-function stopIdleSpin(){ if(idleTimer){ clearInterval(idleTimer); idleTimer = null; } }
-
-const viewer = document.getElementById('viewer3d');
-function dragStart(x){ dragging = true; startX = x; startSpin = spin; }
-function dragMove(x){ if(dragging) setSpin(startSpin + (x - startX) * 0.7); }
-function dragEnd(){ dragging = false; }
-viewer.addEventListener('pointerdown', e=>{ viewer.setPointerCapture(e.pointerId); dragStart(e.clientX); });
-viewer.addEventListener('pointermove', e=>dragMove(e.clientX));
-viewer.addEventListener('pointerup', dragEnd);
-viewer.addEventListener('pointerleave', dragEnd);
-
-function openLightbox(d){
-  currentPhotos = d.photos || null;
-  document.getElementById('plateTiltWrap').style.display = currentPhotos ? 'none' : '';
-  document.getElementById('photoDiscWrap').classList.toggle('active', !!currentPhotos);
-  document.getElementById('viewerBadge').textContent = currentPhotos ? i18n[lang].viewerBadge : i18n[lang].viewerBadgeGeneric;
-  if(currentPhotos){
-    photoFrames.forEach((img,i)=>{
-      img.src = PLATE_PHOTOS[currentPhotos[i]] || '';
-      img.classList.toggle('visible', i === 0);
-    });
-  } else {
-    document.getElementById('plateFood').textContent = d.emoji;
-    plateSpin.style.setProperty('--plate-bg', d.bg);
-  }
-  setSpin(0);
-  document.getElementById('lbName').textContent = d[lang].name;
-  document.getElementById('lbDesc').textContent = d[lang].desc;
-  document.getElementById('lbAllergens').innerHTML = d.allergens && d.allergens.length
-    ? allergenBadges(d.allergens)
-    : `<span class="allergen-badge">${i18n[lang].noAllergens}</span>`;
-  document.getElementById('lightbox').classList.add('open');
-  startIdleSpin();
-}
-function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); stopIdleSpin(); }
-document.getElementById('lightbox').addEventListener('click', e=>{ if(e.target.id==='lightbox') closeLightbox(); });
 
 function renderRestPanel(){
   const list = document.getElementById('restDishList');
