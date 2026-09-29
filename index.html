@@ -225,11 +225,14 @@
 
   /* ---- muro tipo Pinterest (v2) ---- */
   .pin-masonry{
-    column-count:2; column-gap:10px;
+    display:flex; gap:10px;
     padding:4px 14px 100px;
   }
+  .pin-col{
+    flex:1; min-width:0;
+    display:flex; flex-direction:column; gap:10px;
+  }
   .pin-tile{
-    break-inside:avoid; margin-bottom:10px;
     perspective:1200px; cursor:pointer;
   }
   .pin-tile-inner{
@@ -878,6 +881,13 @@ function renderPinGrid(){
     wall.innerHTML = `<div class="empty-state">${i18n[lang].noMatch}</div>`;
     return;
   }
+  // Dos columnas reales: cada ficha se coloca en la columna que este mas corta
+  // en ese momento (como Pinterest), en vez de dejar que el navegador las reparta.
+  const colA = document.createElement('div');
+  colA.className = 'pin-col';
+  const colB = document.createElement('div');
+  colB.className = 'pin-col';
+  let heightA = 0, heightB = 0;
   items.forEach((d,i)=>{
     const photoKey = DISH_PHOTO_KEY[d.es.name];
     const realSrc = (d.photos && d.photos[0] && PLATE_PHOTOS[d.photos[0]])
@@ -911,8 +921,14 @@ function renderPinGrid(){
       if(e.target.closest('.add-btn')){ e.stopPropagation(); return; }
       tile.classList.toggle('flipped');
     });
-    wall.appendChild(tile);
+    // altura estimada de esta ficha (proporcion + cabecera fija de la trasera, aunque
+    // solo la delantera es visible, sirve para decidir en que columna cae mejor)
+    const estHeight = ratio + 0.12;
+    if(heightA <= heightB){ colA.appendChild(tile); heightA += estHeight; }
+    else { colB.appendChild(tile); heightB += estHeight; }
   });
+  wall.appendChild(colA);
+  wall.appendChild(colB);
 }
 
 function renderQuickFilters(){
