@@ -209,11 +209,6 @@
   .dish .info{flex:1; min-width:0;}
   .dish h3{ margin:0 0 4px; font-size:13.5px; font-weight:600; line-height:1.3; color:var(--on-dark); font-family:'Inter',sans-serif; }
   .dish .price{ font:700 14px 'Inter',sans-serif; color:var(--on-dark); }
-  .add-btn{
-    width:34px; height:34px; border-radius:50%; flex:none;
-    background:rgba(245,239,227,.1); color:var(--on-dark);
-    border:none; font-size:18px; display:flex; align-items:center; justify-content:center;
-  }
   .allergens{ display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
   .allergen-badge{
     display:inline-flex; align-items:center; gap:3px;
@@ -262,11 +257,12 @@
     object-fit:contain; transition:none;
     filter:drop-shadow(0 1px 3px rgba(0,0,0,.65)) drop-shadow(0 0 2px rgba(0,0,0,.5));
     pointer-events:none; z-index:2;
-    /* Safari/iOS a veces sigue pintando un elemento con filter aunque el padre
-       tenga backface-visibility:hidden al girar la tarjeta. Se lo ponemos
-       tambien a el directamente para que desaparezca de verdad por detras. */
     backface-visibility:hidden; -webkit-backface-visibility:hidden;
   }
+  /* Ademas de backface-visibility (que Safari/iOS a veces ignora si el elemento
+     tiene filter), ocultamos el icono por estado: en cuanto la tarjeta tiene la
+     clase "flipped" el icono desaparece de verdad, sin depender del navegador. */
+  .pin-tile.flipped .pin-flip-icon{ opacity:0; }
   .pin-ph{
     width:100%; display:flex; align-items:flex-end; justify-content:center;
     position:relative; overflow:hidden;
@@ -317,11 +313,7 @@
   }
   .pin-tile-back .allergens{ margin-bottom:4px; max-height:40px; overflow:hidden; gap:3px; }
   .pin-tile-back .allergen-badge{ padding:2px 6px; font-size:8.5px; }
-  .pin-tile-back .price{ font:700 13px 'Inter',sans-serif; color:var(--on-dark); margin:auto 30px 4px 0; flex:none; }
-  .pin-tile-back .add-btn{
-    position:absolute; right:10px; bottom:10px;
-    width:30px; height:30px; font-size:16px;
-  }
+  .pin-tile-back .price{ font:700 13px 'Inter',sans-serif; color:var(--on-dark); margin:auto 0 4px 0; flex:none; }
   .pin-filter-fab{
     position:absolute; right:16px; bottom:calc(78px + env(safe-area-inset-bottom,0px));
     width:46px; height:46px; border-radius:50%; z-index:15;
@@ -802,11 +794,9 @@ function renderPinGrid(){
           <p>${d[lang].desc || ''}</p>
           ${allergenBadges(d.allergens)}
           <div class="price">${d.price}</div>
-          <button class="add-btn">+</button>
         </div>
       </div>`;
-    tile.addEventListener('click', (e)=>{
-      if(e.target.closest('.add-btn')){ e.stopPropagation(); return; }
+    tile.addEventListener('click', ()=>{
       tile.classList.toggle('flipped');
     });
     // altura estimada de esta ficha (proporcion + cabecera fija de la trasera, aunque
