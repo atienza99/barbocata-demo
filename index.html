@@ -858,28 +858,25 @@ const DISH_PHOTO_KEY = {
   'Caña': 'cerveza',
 };
 const ALL_REAL_PHOTOS = Object.assign({}, DISH_REAL_PHOTOS, DRINK_REAL_PHOTOS, DRINK_REAL_PHOTOS2);
-const PIN_RATIOS = [1.35, 0.85, 1.1, 0.95, 1.5, 1.0];
+// Patron de proporciones (ancho/alto) inspirado directamente en la captura de Pinterest
+// que nos paso el cliente: una secuencia fija de fotos altas/medias/cortas que se repite,
+// en vez de calcularlo segun el texto de la ficha. Valor bajo = foto mas alta (vertical);
+// valor alto = foto mas corta (mas horizontal).
+const PIN_PATTERN = [0.64, 0.92, 1.08, 0.74, 0.86, 1.2, 0.68, 1.0, 0.8, 1.12, 0.9, 0.7];
 function pinSeed(name){
   let h = 0;
   for(let i=0;i<name.length;i++){ h = (h*31 + name.charCodeAt(i)) >>> 0; }
   return (h % 1000) / 1000; // 0..1 estable por plato
 }
 function pinAspectRatio(d, i){
-  // Cuanto mas texto/alergenos hay detras de la ficha, mas alta la foto delantera
-  // (asi la trasera tiene sitio de sobra), y viceversa: fichas cortas -> foto baja/ancha.
-  const descLen = ((d[lang] && d[lang].desc) || '').length;
-  const allergenCount = (d.allergens || []).length;
-  const nameLen = ((d[lang] && d[lang].name) || '').length;
-  const score = descLen + nameLen*0.6 + allergenCount*16;
-  // Mapeo continuo (no por tramos) para que no se agrupen fotos con la misma altura exacta
-  let ratio = 0.68 + Math.min(1, score/120) * 0.85; // ~0.68 - 1.53
-  // Pequeño empuje estable por plato (segun su nombre) para romper la cuadricula y que
-  // se note mas el efecto mosaico, mas un ligero contraste par/impar entre columnas.
+  // Posicion en el patron segun el orden en que se pinta la ficha (no segun el texto),
+  // para que el intercalado se vea igual de irregular que en la captura de referencia.
+  const base = PIN_PATTERN[i % PIN_PATTERN.length];
+  // Pequeño empuje estable por plato (segun su nombre) para que dos fichas que caigan
+  // en la misma posicion del patron (p.ej. al filtrar) no salgan clonadas.
   const seed = pinSeed(d.es.name);
-  ratio += (seed - 0.5) * 0.32;
-  ratio += (i % 2 === 0) ? -0.05 : 0.07;
-  if(allergenCount >= 3) ratio = Math.max(ratio, 1.15);
-  return Math.max(0.62, Math.min(1.65, ratio));
+  const ratio = base + (seed - 0.5) * 0.1;
+  return Math.max(0.6, Math.min(1.3, ratio));
 }
 function shadeColor(hex, amt){
   const n = hex.replace('#','');
