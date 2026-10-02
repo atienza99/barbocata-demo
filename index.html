@@ -263,6 +263,24 @@
      tiene filter), ocultamos el icono por estado: en cuanto la tarjeta tiene la
      clase "flipped" el icono desaparece de verdad, sin depender del navegador. */
   .pin-tile.flipped .pin-flip-icon{ opacity:0; }
+  .pin-tile-front svg.pin-star-icon{
+    position:absolute; top:8px; left:8px; width:22px; height:22px;
+    fill:rgba(20,16,12,.35); stroke:#fff; stroke-width:1.4;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,.65)) drop-shadow(0 0 2px rgba(0,0,0,.5));
+    cursor:pointer; z-index:3;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    transition:transform .15s ease;
+  }
+  .pin-tile-front svg.pin-star-icon:active{ transform:scale(1.15); }
+  .pin-tile-front svg.pin-star-icon.fav-active{
+    fill:#FFCC33; stroke:#E8A800;
+  }
+  /* Igual que el icono de girar: ocultamos la estrella por estado al dar la
+     vuelta a la ficha, para que nunca se vea en la parte de atras. */
+  .pin-tile.flipped .pin-star-icon{ opacity:0; }
+  .pin-qf-chip.pin-qf-favbtn.active{
+    background:#FFCC33; color:#3a2a00; border-color:#E8A800;
+  }
   .pin-ph{
     width:100%; display:flex; align-items:flex-end; justify-content:center;
     position:relative; overflow:hidden;
@@ -510,9 +528,9 @@
 <script>
 let lang = 'es';
 const i18n = {
-  es:{ filterBtn:'Filtrar', navHome:'Inicio', navMenu:'Carta', navOrder:'Pedido', navProfile:'Perfil', filterTitle:'Filtrar por alérgenos', filterSub:'Oculta de la carta los platos que contengan lo que marques', dietTitle:'Preferencias', dietSub:'Muestra solo los platos que cumplan lo que marques', clear:'Limpiar', apply:'Aplicar filtros', without:'Sin', noMatch:'Ningún plato de esta categoría cumple los filtros que has puesto 🙁' },
-  ca:{ filterBtn:'Filtra', navHome:'Inici', navMenu:'Carta', navOrder:'Comanda', navProfile:'Perfil', filterTitle:'Filtra per al·lèrgens', filterSub:'Amaga de la carta els plats que continguin el que marquis', dietTitle:'Preferències', dietSub:'Mostra només els plats que compleixin el que marquis', clear:'Neteja', apply:'Aplica els filtres', without:'Sense', noMatch:"Cap plat d'aquesta categoria compleix els filtres que has posat 🙁" },
-  en:{ filterBtn:'Filter', navHome:'Home', navMenu:'Menu', navOrder:'Order', navProfile:'Profile', filterTitle:'Filter by allergens', filterSub:'Hide dishes from the menu that contain what you select', dietTitle:'Preferences', dietSub:'Show only dishes that match what you select', clear:'Clear', apply:'Apply filters', without:'No', noMatch:'No dish in this category matches your filters 🙁' },
+  es:{ filterBtn:'Filtrar', favoritesBtn:'Favoritos', noFavorites:'Todavía no has marcado ningún plato como favorito ⭐', navHome:'Inicio', navMenu:'Carta', navOrder:'Pedido', navProfile:'Perfil', filterTitle:'Filtrar por alérgenos', filterSub:'Oculta de la carta los platos que contengan lo que marques', dietTitle:'Preferencias', dietSub:'Muestra solo los platos que cumplan lo que marques', clear:'Limpiar', apply:'Aplicar filtros', without:'Sin', noMatch:'Ningún plato de esta categoría cumple los filtros que has puesto 🙁' },
+  ca:{ filterBtn:'Filtra', favoritesBtn:'Favorits', noFavorites:'Encara no has marcat cap plat com a favorit ⭐', navHome:'Inici', navMenu:'Carta', navOrder:'Comanda', navProfile:'Perfil', filterTitle:'Filtra per al·lèrgens', filterSub:'Amaga de la carta els plats que continguin el que marquis', dietTitle:'Preferències', dietSub:'Mostra només els plats que compleixin el que marquis', clear:'Neteja', apply:'Aplica els filtres', without:'Sense', noMatch:"Cap plat d'aquesta categoria compleix els filtres que has posat 🙁" },
+  en:{ filterBtn:'Filter', favoritesBtn:'Favorites', noFavorites:"You haven't marked any dish as a favorite yet ⭐", navHome:'Home', navMenu:'Menu', navOrder:'Order', navProfile:'Profile', filterTitle:'Filter by allergens', filterSub:'Hide dishes from the menu that contain what you select', dietTitle:'Preferences', dietSub:'Show only dishes that match what you select', clear:'Clear', apply:'Apply filters', without:'No', noMatch:'No dish in this category matches your filters 🙁' },
 };
 const allergenMeta = {
   gluten:{icon:'🌾', es:'Gluten', ca:'Gluten', en:'Gluten'},
@@ -660,6 +678,10 @@ function updateStaticText(){
 
 let activeFilters = new Set();
 let activeDiet = new Set();
+// Favoritos: el comensal marca con la estrellita los platos que le interesan
+// para poder pedirselos todos de golpe al camarero sin tener que recordarlos.
+let favorites = new Set();
+let showFavoritesOnly = false;
 function allPinDishes(){
   return Object.keys(dishes).flatMap(catKey =>
     dishes[catKey].map(d => Object.assign({_cat:catKey}, d))
@@ -670,7 +692,8 @@ function filteredPinDishes(){
   return allPinDishes().filter(d =>
     (selectedPinCat === 'all' || d._cat === selectedPinCat) &&
     !(d.allergens||[]).some(a => activeFilters.has(a)) &&
-    [...activeDiet].every(k => (d.diet||[]).includes(k))
+    [...activeDiet].every(k => (d.diet||[]).includes(k)) &&
+    (!showFavoritesOnly || favorites.has(d.es.name))
   );
 }
 function renderCatTabs(){
@@ -757,7 +780,8 @@ function renderPinGrid(){
   wall.innerHTML = '';
   const items = filteredPinDishes();
   if(!items.length){
-    wall.innerHTML = `<div class="empty-state">${i18n[lang].noMatch}</div>`;
+    const emptyMsg = showFavoritesOnly ? i18n[lang].noFavorites : i18n[lang].noMatch;
+    wall.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
     return;
   }
   // Dos columnas reales: cada ficha se coloca en la columna que este mas corta
@@ -783,10 +807,14 @@ function renderPinGrid(){
             <span class="pin-ph-emoji">${d.emoji || '🍽️'}</span>
           </div>`;
         })();
+    const isFav = favorites.has(d.es.name);
     tile.innerHTML = `
       <div class="pin-tile-inner">
         <div class="pin-tile-front">
           ${frontHtml}
+          <svg class="pin-star-icon${isFav ? ' fav-active' : ''}" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"></path>
+          </svg>
           <img class="pin-flip-icon" src="${PIN_FLIP_ICON}" alt="" aria-hidden="true">
         </div>
         <div class="pin-tile-back">
@@ -798,6 +826,16 @@ function renderPinGrid(){
       </div>`;
     tile.addEventListener('click', ()=>{
       tile.classList.toggle('flipped');
+    });
+    const starEl = tile.querySelector('.pin-star-icon');
+    starEl.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const name = d.es.name;
+      if(favorites.has(name)){ favorites.delete(name); }
+      else { favorites.add(name); }
+      starEl.classList.toggle('fav-active');
+      renderQuickFilters();
+      if(showFavoritesOnly) renderPinGrid();
     });
     // altura estimada de esta ficha (proporcion + cabecera fija de la trasera, aunque
     // solo la delantera es visible, sirve para decidir en que columna cae mejor)
@@ -818,6 +856,15 @@ function renderQuickFilters(){
   allBtn.innerHTML = `🎚️ ${i18n[lang].filterBtn}`;
   allBtn.onclick = openFilterSheet;
   wrap.appendChild(allBtn);
+  const favChip = document.createElement('div');
+  favChip.className = 'pin-qf-chip pin-qf-favbtn' + (showFavoritesOnly ? ' active' : '');
+  const favCount = favorites.size;
+  favChip.innerHTML = `⭐ ${i18n[lang].favoritesBtn}${favCount ? ` (${favCount})` : ''}`;
+  favChip.onclick = ()=>{
+    showFavoritesOnly = !showFavoritesOnly;
+    refreshFilterUI();
+  };
+  wrap.appendChild(favChip);
   const sep0 = document.createElement('div');
   sep0.className = 'pin-qf-sep';
   wrap.appendChild(sep0);
@@ -849,7 +896,7 @@ function refreshFilterUI(){
   renderQuickFilters();
   if(document.getElementById('filterChips')) renderFilterChips();
   if(document.getElementById('dietChips')) renderDietChips();
-  document.getElementById('filterFab').classList.toggle('has-filters', activeFilters.size > 0 || activeDiet.size > 0);
+  document.getElementById('filterFab').classList.toggle('has-filters', activeFilters.size > 0 || activeDiet.size > 0 || showFavoritesOnly);
   renderPinGrid();
 }
 function renderFilterChips(){
