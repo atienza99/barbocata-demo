@@ -100,7 +100,7 @@ button{font:inherit;color:inherit}
 .inside .fx .face,.inside .fx.plane,.inside .fx.disc{opacity:.14}
 
 /* Pins que siempre miran a cámara */
-#runSprite{position:fixed;left:0;top:0;z-index:3;pointer-events:none;will-change:transform}
+#runSprite{position:fixed;left:0;top:0;z-index:5;pointer-events:none;will-change:transform}
 #runSprite .rs-l,#runSprite .rs-a{transform-box:view-box}
 #runSprite .rs-l{transform-origin:21px 56px;animation:rsSwing .2s ease-in-out infinite alternate}
 #runSprite .rs-a{transform-origin:21px 27px;animation:rsSwing .2s ease-in-out infinite alternate-reverse}
@@ -823,7 +823,20 @@ runSprite.innerHTML = `<svg viewBox="0 0 42 100" width="100%" height="100%">
   <g class="rs-a f"><line x1="21" y1="27" x2="21" y2="51" stroke="#232327" stroke-width="5.5" stroke-linecap="round"/><circle cx="21" cy="53" r="3" fill="#b8805a"/></g>
 </svg>`;
 document.body.appendChild(runSprite);
-const anchFoot = div('anchor', {left:'512px', top:'935px'}, world2), anchHead = div('anchor', {left:'512px', top:'935px'}, world2);
+// Proyección calculada a mano (matriz de la cámara + perspectiva del visor), sin depender de getBoundingClientRect,
+// que en algunos navegadores móviles devuelve posiciones vacías dentro de la escena 3D y dejaba la figura fuera de pantalla
+let lastProj = null;
+function project(px, py, pz){
+  let M;
+  try { const t = getComputedStyle(camera2).transform; M = new DOMMatrix(t && t !== 'none' ? t : undefined); } catch (_) { return lastProj; }
+  const p = M.transformPoint(new DOMPoint(px - 600, py - 500, pz, 1));
+  const W = vp.clientWidth || innerWidth, H = vp.clientHeight || innerHeight, d = 2000;
+  const X = W * .5 + p.x / (p.w || 1), Y = H * .48 + p.y / (p.w || 1), Z = p.z / (p.w || 1);
+  const k = d / Math.max(1, d - Z), ox = W * .5, oy = H * .4;
+  const r = { x: ox + (X - ox) * k, y: oy + (Y - oy) * k };
+  if (!isFinite(r.x) || !isFinite(r.y)) return lastProj;
+  return (lastProj = r);
+}
 function startRun(){
   cancelAnimationFrame(runRAF);
   const t0 = performance.now(), T = 3600;
@@ -835,12 +848,12 @@ function startRun(){
     if (p < .72) x = 550 * Math.max(0, p - .04) / .68;                        // corre calle abajo
     else { x = 550; y = -48 * Math.max(0, p - .76) / .24; runSprite.classList.add('back'); }   // llega a la puerta del Bar Bocata 2 y entra
     const bob = p < .72 ? Math.abs(Math.sin((now - t0) / 1000 * Math.PI * 5)) * 3 : 0;
-    anchFoot.style.transform = `translate3d(${x}px, ${y}px, ${bob}px)`;
-    anchHead.style.transform = `translate3d(${x}px, ${y}px, ${bob + 112}px)`;
-    const f = anchFoot.getBoundingClientRect(), h = anchHead.getBoundingClientRect();
-    const H = Math.max(8, f.top - h.top), W = H * .42;
-    runSprite.style.transform = `translate3d(${f.left - W / 2}px, ${f.top - H}px, 0)`;
-    runSprite.style.width = W + 'px'; runSprite.style.height = H + 'px';
+    const f = project(512 + x, 935 + y, bob), h = project(512 + x, 935 + y, bob + 112);
+    if (f && h) {
+      const H = Math.min(260, Math.max(14, Math.hypot(f.x - h.x, f.y - h.y))), W = H * .42;
+      runSprite.style.transform = `translate3d(${f.x - W / 2}px, ${f.y - H}px, 0)`;
+      runSprite.style.width = W + 'px'; runSprite.style.height = H + 'px';
+    }
     if (p > .8) runSprite.style.opacity = Math.max(0, 1 - (p - .8) / .17);
     if (p >= .97) { runSprite.hidden = true; return; }                       // ya ha entrado
     runRAF = requestAnimationFrame(step);
