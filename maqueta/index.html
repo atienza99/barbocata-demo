@@ -75,6 +75,15 @@ button{font:inherit;color:inherit}
 .zone.hot{border-color:rgba(242,178,90,.7);background-color:rgba(242,178,90,.07)}
 .zone.current{border-color:rgba(242,178,90,.95);background-color:rgba(242,178,90,.1)}
 #world .zone{pointer-events:auto;cursor:pointer}
+.person,.mover,.legpivot,.leg{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
+/* Sin mesa: el chico de negro se gira y se va corriendo calle abajo */
+.runaway .runner .mover{animation:run 2.9s cubic-bezier(.45,0,.85,.7) forwards}
+@keyframes run{0%{transform:translate3d(0,0,0) rotateZ(0deg)}12%{transform:translate3d(0,0,0) rotateZ(-90deg)}100%{transform:translate3d(740px,0,0) rotateZ(-90deg)}}
+.runaway .runner .legpivot.l .leg{animation:stride .2s ease-in-out .3s 13 alternate}
+.runaway .runner .legpivot.r .leg{animation:stride .2s ease-in-out .5s 12 alternate-reverse}
+.runaway .runner .raise.l{animation:stride .2s ease-in-out .5s 12 alternate-reverse}
+.runaway .runner .raise.r{animation:stride .2s ease-in-out .3s 13 alternate}
+@keyframes stride{from{transform:rotateX(-38deg)}to{transform:rotateX(38deg)}}
 .armpivot,.swing,.raise{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
 .raise{transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
 .clapping .raise{transform:rotateX(172deg)}   /* brazos arriba, por encima de la cabeza */
@@ -296,6 +305,7 @@ form.res .full{grid-column:1/-1}
 #panel form.res input,#panel form.res select{background:var(--b-paper);border:1px solid var(--b-line);color:var(--b-ink)}
 #panel form.res input:focus,#panel form.res select:focus{outline:2px solid var(--b-red);outline-offset:1px}
 #panel .note{font:12px/1.45 var(--f-ui);color:var(--b-mute)}
+#panel .ko{grid-column:1/-1;padding:10px 12px;border-radius:10px;background:#fff3e0;border:1px solid #f3c58a;color:#5a3a12;font-size:14px}
 #panel .ok{background:#fdecef;border:1px solid #f5b9c4;color:var(--b-ink)}
 #panel :focus-visible{outline-color:var(--b-red)}
 .dock button[aria-pressed="true"]{background:#d6102e;color:#fff}
@@ -585,31 +595,37 @@ for (let k = 0; k < 6; k++) disc(602, 482 + k*12, 4, 168, 'rgba(230,240,245,.75)
 [510, 640, 750].forEach(y => pool(560, y, 60));
 OFF = 0;
 // Personajes: figura alta vestida de negro en la entrada y otra más bajita con camiseta blanca y bigote dentro
-function person(x, y, o){   // x,y = centro en planta (coordenadas finales); mira hacia la calle (sur)
+function person(x, y, o){   // x,y = centro en planta (coordenadas finales); mira hacia la calle (sur). Todo va dentro de un grupo para poder animarlo
   const SK = o.skin || '#c98f68', L = o.legs, T = o.torso, z0 = o.z || 0;
-  cshadow(x, y+2, 17, z0+1.2);
-  box(x-7, y-3, 5, 6, L, o.pants, {z:z0}); box(x+2, y-3, 5, 6, L, o.pants, {z:z0});                // piernas
-  box(x-8, y-4, 16, 8, 3, '#111', {z:z0, faces:'ts'});                                                  // zapatos
-  box(x-9, y-5, 18, 10, T, o.shirt, {z:z0+L});                                                         // torso
+  const root = div('person ' + (o.cls || ''), {left:x+'px', top:y+'px', transform:`translateZ(${z0}px)`});
+  const m = div('mover', {}, root);
+  div('cshadow', {left:'-17px', top:'-15px', width:'34px', height:'34px', transform:'translateZ(1.2px)'}, m);
+  [[-4.5, 'l'], [4.5, 'r']].forEach(([lx, side]) => {                                                   // piernas articuladas en la cadera
+    const hip = div('legpivot ' + side, {left:lx+'px', top:'0px', transform:`translateZ(${L}px)`}, m);
+    const lg = div('leg', {}, hip);
+    box(-2.5, -3, 5, 6, L, o.pants, {parent:lg, z:-L});
+    box(-3, -3.5, 6, 8, 3, '#111', {parent:lg, z:-L, faces:'ts'});                                      // zapato
+  });
+  box(-9, -5, 18, 10, T, o.shirt, {parent:m, z:L});                                                      // torso
   const arm = o.sleeve ? o.shirt : SK;
-  // Brazos articulados en el hombro: .swing gira hacia dentro (aplauso) y .raise los levanta hacia delante
-  [[x-13, 'l'], [x+9, 'r']].forEach(([ax, side]) => {
-    const g = div('armpivot', {left:(ax+2)+'px', top:y+'px', width:'0px', height:'0px', transform:`translateZ(${z0+L+T-1}px)`});
-    const sw = div('swing ' + side, {}, g), rs = div('raise', {}, sw);
+  // Brazos articulados en el hombro: .swing gira (aplauso) y .raise los levanta
+  [[-11, 'l'], [11, 'r']].forEach(([ax, side]) => {
+    const g = div('armpivot', {left:ax+'px', top:'0px', transform:`translateZ(${L+T-1}px)`}, m);
+    const sw = div('swing ' + side, {}, g), rs = div('raise ' + side, {}, sw);
     box(-2, -3, 4, 6, T*.35, o.shirt, {parent:rs, z:-T*.35});
     box(-2, -3, 4, 6, T*.62, arm, {parent:rs, z:-T+1});
-    box(-2.2, -3.2, 4.4, 6.4, 5, SK, {parent:rs, z:-T-3});                                          // mano
+    box(-2.2, -3.2, 4.4, 6.4, 5, SK, {parent:rs, z:-T-3});                                              // mano
   });
-  const hz = z0 + L + T;
-  box(x-3, y-3, 6, 6, 3, SK, {z:hz, faces:'sw'});                                                      // cuello
-  box(x-6, y-6, 12, 12, 14, SK, {z:hz+3, top:o.hair});                                                 // cabeza
-  box(x-6.5, y-6.5, 13, 5, 16, o.hair, {z:hz+3});                                                      // pelo por detrás
-  box(x-6.5, y-6.5, 13, 13, 4, o.hair, {z:hz+15});                                                     // pelo arriba
-  [x-3.5, x+1.5].forEach(ex => box(ex, y+6, 2, 1, 2, '#1a1a1a', {z:hz+10, faces:'s'}));                // ojos
-  if (o.mustache) box(x-4, y+6, 8, 2, 2.5, o.hair, {z:hz+5});                                          // bigote
+  const hz = L + T;
+  box(-3, -3, 6, 6, 3, SK, {parent:m, z:hz, faces:'sw'});                                                // cuello
+  box(-6, -6, 12, 12, 14, SK, {parent:m, z:hz+3, top:o.hair});                                           // cabeza
+  box(-6.5, -6.5, 13, 5, 16, o.hair, {parent:m, z:hz+3});                                                // pelo por detrás
+  box(-6.5, -6.5, 13, 13, 4, o.hair, {parent:m, z:hz+15});                                               // pelo arriba
+  [-3.5, 1.5].forEach(ex => box(ex, 6, 2, 1, 2, '#1a1a1a', {parent:m, z:hz+10, faces:'s'}));            // ojos
+  if (o.mustache) box(-4, 6, 8, 2, 2.5, o.hair, {parent:m, z:hz+5});                                     // bigote
 }
 MAP = false;
-person(512, 935, {legs:50, torso:38, pants:'#141416', shirt:'#1b1b1e', sleeve:true, hair:'#2a1a12', skin:'#b8805a'});   // alto, todo de negro, moreno
+person(512, 935, {cls:'runner', legs:50, torso:38, pants:'#141416', shirt:'#1b1b1e', sleeve:true, hair:'#2a1a12', skin:'#b8805a'});   // alto, todo de negro, moreno
 person(512, 700, {legs:34, torso:30, pants:'#3b3f48', shirt:'#f5f3ef', hair:'#3a2a20', skin:'#d29a74', mustache:true});   // bajito, camiseta blanca y bigote
 MAP = true;
 // La barra se cierra contra la pared al final del tramo trasero
@@ -781,6 +797,14 @@ function openPanel(key){
 }
 // Reserva hecha: la cámara enfoca a los dos personajes y se ponen a aplaudir
 let clapT;
+// Horas sin mesa (demo): en la versión real lo diría el motor de reservas
+const FULL = ['21:00', '21:30'];
+function runAway(){
+  const cl = document.body.classList;
+  const c = {x:820, y:900, rx:58, rz:-10, z:1.0}; Object.assign(cam, {x:c.x, y:c.y, rx:c.rx, rz:c.rz, h:0, s:c.z*fit()});
+  cl.add('upstairs'); cl.remove('clapping', 'runaway'); void document.body.offsetWidth; apply();
+  setTimeout(() => cl.add('runaway'), 450);
+}
 // Confeti: piezas planas en una capa 2D por encima de la maqueta (solo transform, muy ligero) que se borran al acabar
 function confetti(){
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -800,7 +824,7 @@ function celebrate(){
     const c = ZONES.entrada.cam; Object.assign(cam, {x:c.x, y:c.y, rx:c.rx, rz:c.rz, h:0, s:c.z*fit()});
     document.body.classList.add('upstairs'); apply();
   }
-  const cl = document.body.classList; cl.remove('clapping'); void document.body.offsetWidth;
+  const cl = document.body.classList; cl.remove('clapping', 'runaway'); void document.body.offsetWidth;   // si se había ido corriendo, vuelve a la puerta
   clearTimeout(clapT); setTimeout(() => { cl.add('clapping'); confetti(); }, 500);
   clapT = setTimeout(() => cl.remove('clapping'), 4800);
 }
@@ -812,13 +836,19 @@ function showForm(key){
   const down = key === 'sala' || key === 'larga';
   slot.innerHTML = `<form class="res" id="resForm">
     <label>Dia<input id="rDate" type="date" value="${iso}" min="${ymd(new Date())}" required></label>
-    <label>Hora<select id="rTime">${['13:00','13:30','14:00','14:30','20:00','20:30','21:00','21:30','22:00'].map(t=>`<option ${t==='21:00'?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label>Hora<select id="rTime">${['13:00','13:30','14:00','14:30','20:00','20:30','21:00','21:30','22:00'].map(t=>`<option value="${t}" ${t==='20:30'?'selected':''}>${t}${FULL.includes(t) ? ' · complet' : ''}</option>`).join('')}</select></label>
     <label>Persones<select id="rPax">${[1,2,3,4,5,6].map(n=>`<option ${n===2?'selected':''}>${n}</option>`).join('')}</select></label>
     <label>Zona<select id="rZone"><option ${down?'':'selected'}>Planta carrer</option><option ${down?'selected':''}>Sala de baix</option></select></label>
     <button class="cta full" type="submit">Sol·licita la reserva</button>
     <p class="note full">Prototip: aquí es connectaria el motor de reserves del restaurant.</p></form>`;
   $('#resForm').addEventListener('submit', e => {
     e.preventDefault();
+    const t = $('#rTime').value;
+    if (FULL.includes(t)) {                     // no queda mesa: aviso y el chico de la puerta se va corriendo
+      let ko = $('#resForm .ko'); if (!ko) { ko = document.createElement('div'); ko.className = 'ko full'; $('#resForm button[type=submit]').before(ko); }
+      ko.innerHTML = `Ho sentim, a les <b>${t}</b> no queda cap taula lliure. Prova una altra hora.`;
+      runAway(); return;
+    }
     celebrate();
     const d = new Date($('#rDate').value+'T12:00').toLocaleDateString('ca-ES',{weekday:'long',day:'numeric',month:'long'});
     e.target.innerHTML = `<div class="ok">Taula per a <b>${$('#rPax').value}</b> a la <b>${$('#rZone').value.toLowerCase()}</b>, ${d} a les <b>${$('#rTime').value}</b>. <br><span class="note">A la versió real, aquí arribaria la confirmació.</span></div>`;
@@ -907,7 +937,7 @@ function enter(){
 }
 function toStreet(){
   entryTimers.splice(0).forEach(clearTimeout);
-  document.body.classList.remove('arriving', 'dragging');
+  document.body.classList.remove('arriving', 'dragging', 'runaway', 'clapping');
   closePanel();
   facade.hidden = false; setInert(true);
   requestAnimationFrame(() => requestAnimationFrame(() => facade.classList.remove('entering','opening')));
