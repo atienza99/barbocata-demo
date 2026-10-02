@@ -214,6 +214,10 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .axis{position:absolute;font-size:.72rem;color:var(--muted)}
 .axis.x{bottom:4px;left:50%;transform:translateX(-50%)}
 .axis.y{left:4px;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:left top}
+.dot.edge{align-items:flex-end;transform:translate(calc(-100% + 12px),50%)}
+.dot.edge-l{align-items:flex-start;transform:translate(-12px,50%)}
+@media (max-width:620px){.plot{aspect-ratio:.9}.q{font-size:.66rem;max-width:46%;padding:8px}.dot span{font-size:.64rem}}
+@media (max-height:820px) and (min-width:881px){.cover h1{font-size:clamp(2.4rem,5.2vw,4rem)}.logo-hero{width:min(380px,100%);margin-bottom:18px}.cover .lead{margin-top:12px}.where{margin-top:14px}}
 .rec{margin-top:18px}
 .rec b{font-size:1.1rem}
 .rec p{margin-top:6px}
@@ -964,16 +968,16 @@ input[type=range]{width:100%;accent-color:var(--red)}
     ['Gambas al ajillo',160,9.15,'Joya escondida','Es el plato que más deja por ración. Destacadlo con foto en la carta digital y en redes.'],
     ['Macarrones',225,7.40,'Joya escondida','Funcionan muy bien en el menú del mediodía. Proponedlos como plato del día una vez por semana.'],
     ['Mousse de chocolate',190,5.30,'Joya escondida','Sugerir el postre al final de la comida puede casi doblar su salida.'],
-    ['Montadito de tartar',140,3.40,'Candidato a revisar','Deja poco para lo que cuesta prepararlo. Revisad la ración o subid 50 céntimos.'],
-    ['Ensaladilla',80,4.10,'Candidato a revisar','Se pide poco. Probad a pasarla al menú del día antes de quitarla.']
+    ['Montadito de tartar',150,3.20,'Candidato a revisar','Deja poco para lo que cuesta prepararlo. Revisad la ración o subid 50 céntimos.'],
+    ['Ensaladilla',60,4.40,'Candidato a revisar','Se pide poco. Probad a pasarla al menú del día antes de quitarla.']
   ];
   var VX=250, VY=5, XMAX=580, YMIN=1, YMAX=10.5;
-  var px=function(v){return 6+v/XMAX*88;}, py=function(v){return 8+(v-YMIN)/(YMAX-YMIN)*80;};
+  var px=function(v){return 6+v/XMAX*88;}, py=function(v){return 16+(v-YMIN)/(YMAX-YMIN)*74;};
   $('mx-vl').style.left=px(VX)+'%'; $('mx-hl').style.bottom=py(VY)+'%';
   var plot=$('plot');
   MX.forEach(function(d,i){
     var b=el('button','dot','<i></i><span></span>'); b.type='button'; b.lastChild.textContent=d[0];
-    b.style.left=px(d[1])+'%'; b.style.bottom=py(d[2])+'%'; b.setAttribute('aria-pressed',i===3);
+    b.style.left=px(d[1])+'%'; b.style.bottom=py(d[2])+'%'; if(px(d[1])>78) b.classList.add('edge'); else if(px(d[1])<16) b.classList.add('edge-l'); b.setAttribute('aria-pressed',i===3);
     b.setAttribute('aria-label',d[0]+': '+d[1]+' raciones a la semana, '+eur(d[2],2)+' por plato');
     b.addEventListener('click',function(){press(plot,b);mxShow(i);}); plot.appendChild(b);
   });
