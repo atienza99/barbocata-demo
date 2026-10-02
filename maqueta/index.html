@@ -77,11 +77,14 @@ button{font:inherit;color:inherit}
 #world .zone{pointer-events:auto;cursor:pointer}
 .armpivot,.swing,.raise{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
 .raise{transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
-.clapping .raise{transform:rotateX(82deg)}
+.clapping .raise{transform:rotateX(172deg)}   /* brazos arriba, por encima de la cabeza */
 .clapping .swing.l{animation:clapL .3s ease-in-out .35s infinite alternate}
 .clapping .swing.r{animation:clapR .3s ease-in-out .35s infinite alternate}
-@keyframes clapL{from{transform:rotateZ(-6deg)}to{transform:rotateZ(-21deg)}}
-@keyframes clapR{from{transform:rotateZ(6deg)}to{transform:rotateZ(21deg)}}
+@keyframes clapL{from{transform:rotateY(4deg)}to{transform:rotateY(19deg)}}
+@keyframes clapR{from{transform:rotateY(-4deg)}to{transform:rotateY(-19deg)}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+#confetti i{position:absolute;top:-24px;display:block;border-radius:2px;will-change:transform;animation:fall var(--t) cubic-bezier(.25,.4,.5,1) var(--d) forwards}
+@keyframes fall{to{transform:translate3d(var(--x),112vh,0) rotate(var(--r))}}
 
 .upstairs .lowfx{visibility:hidden}
 /* Corte tipo casa de muñecas: la pared que queda entre la cámara y la sala se oculta (se ve mejor y hay mucho menos que pintar) */
@@ -778,13 +781,27 @@ function openPanel(key){
 }
 // Reserva hecha: la cámara enfoca a los dos personajes y se ponen a aplaudir
 let clapT;
+// Confeti: piezas planas en una capa 2D por encima de la maqueta (solo transform, muy ligero) que se borran al acabar
+function confetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let layer = $('#confetti'); if (!layer) { layer = document.createElement('div'); layer.id = 'confetti'; layer.setAttribute('aria-hidden', 'true'); document.body.appendChild(layer); }
+  const cols = ['#d6102e', '#004d98', '#a50044', '#f6c800', '#ffffff', '#f2b25a'], frag = document.createDocumentFragment(), n = innerWidth < 760 ? 70 : 120;
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('i'), w = 6 + Math.random() * 7;
+    p.style.cssText = `left:${Math.random() * 100}%;width:${w}px;height:${w * (.4 + Math.random() * .6)}px;background:${cols[i % cols.length]};` +
+      `--x:${(Math.random() - .5) * 220}px;--r:${(Math.random() - .5) * 1440}deg;--t:${2.4 + Math.random() * 1.8}s;--d:${Math.random() * .9}s`;
+    frag.appendChild(p);
+  }
+  layer.appendChild(frag);
+  setTimeout(() => layer.replaceChildren(), 5400);
+}
 function celebrate(){
   if (!['entrada','barra','mesas'].includes(current)) {
     const c = ZONES.entrada.cam; Object.assign(cam, {x:c.x, y:c.y, rx:c.rx, rz:c.rz, h:0, s:c.z*fit()});
     document.body.classList.add('upstairs'); apply();
   }
   const cl = document.body.classList; cl.remove('clapping'); void document.body.offsetWidth;
-  clearTimeout(clapT); setTimeout(() => cl.add('clapping'), 500);
+  clearTimeout(clapT); setTimeout(() => { cl.add('clapping'); confetti(); }, 500);
   clapT = setTimeout(() => cl.remove('clapping'), 4800);
 }
 function closePanel(){ document.body.classList.remove('panel-open'); }
