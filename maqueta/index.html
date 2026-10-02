@@ -53,7 +53,8 @@ button{font:inherit;color:inherit}
 .disc{position:absolute;border-radius:50%}
 .plane{position:absolute}
 .glowdot{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff3d6 0 18%,rgba(255,206,130,.75) 28%,rgba(242,178,90,.25) 50%,transparent 70%)}
-.pool{position:absolute;border-radius:50%;background:radial-gradient(closest-side, rgba(242,178,90,.32), rgba(242,178,90,0));transform:translateZ(1px)}
+.cshadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side, rgba(25,10,4,.5), rgba(25,10,4,.18) 55%, rgba(25,10,4,0))}
+.pool{position:absolute;border-radius:50%;background:radial-gradient(closest-side, rgba(255,196,110,.42), rgba(242,178,90,.12) 60%, rgba(242,178,90,0));transform:translateZ(1px)}
 
 .floor-in{background:
   repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 1px, transparent 1px 44px),
@@ -64,7 +65,7 @@ button{font:inherit;color:inherit}
   repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 2px, transparent 2px 60px),
   #8e8a80}
 .floor-street{background:var(--panot)}
-.floor-low{background:radial-gradient(circle, rgba(255,232,215,.4) 0 1px, transparent 1.6px) 0 0/7px 7px, radial-gradient(circle, rgba(50,12,6,.4) 0 1px, transparent 1.6px) 3px 4px/9px 9px, radial-gradient(circle, rgba(230,190,160,.3) 0 1.5px, transparent 2px) 5px 1px/13px 11px, #9c4632}
+.floor-low{background:radial-gradient(140% 90% at 50% 40%, rgba(255,214,160,.08), rgba(12,4,2,.28) 100%), radial-gradient(circle, rgba(255,232,215,.4) 0 1px, transparent 1.6px) 0 0/7px 7px, radial-gradient(circle, rgba(50,12,6,.4) 0 1px, transparent 1.6px) 3px 4px/9px 9px, radial-gradient(circle, rgba(230,190,160,.3) 0 1.5px, transparent 2px) 5px 1px/13px 11px, #9c4632}
 .hydraulic{background:
   radial-gradient(circle at 50% 50%, #c9b48f 0 22%, transparent 23%),
   conic-gradient(from 45deg, #2f5a4c 0 25%, #e6d9c2 0 50%, #2f5a4c 0 75%, #e6d9c2 0) ;
@@ -74,12 +75,14 @@ button{font:inherit;color:inherit}
 .zone.hot{border-color:rgba(242,178,90,.7);background-color:rgba(242,178,90,.07)}
 .zone.current{border-color:rgba(242,178,90,.95);background-color:rgba(242,178,90,.1)}
 #world .zone{pointer-events:auto;cursor:pointer}
+.upstairs .lowfx{visibility:hidden}
 /* Corte tipo casa de muñecas: la pared que queda entre la cámara y la sala se oculta (se ve mejor y hay mucho menos que pintar) */
 .cut-w .wall-w,.cut-e .wall-e,.cut-n .wall-n{visibility:hidden}
 .fx .face,.fx.plane,.fx.disc{transition:opacity .7s}
 .inside .fx .face,.inside .fx.plane,.inside .fx.disc{opacity:.14}
 
 /* Pins que siempre miran a cámara */
+#grade{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(120% 95% at 50% 45%, rgba(0,0,0,0) 55%, rgba(6,8,12,.55) 100%), linear-gradient(rgba(255,190,120,.05), rgba(255,190,120,.05))}
 #pins{position:fixed;inset:0;pointer-events:none;z-index:3;transition:opacity .4s}
 .arriving #pins{opacity:0}
 .arriving #panel{transition-delay:.85s}
@@ -292,6 +295,7 @@ form.res .full{grid-column:1/-1}
 <div id="viewport" aria-label="Maqueta 3D del restaurant. Arrossega per girar; roda o pessic per apropar.">
   <div id="camera"><div id="world"></div></div>
 </div>
+<div id="grade" aria-hidden="true"></div>
 <div id="pins"></div>
 
 <header class="topbar">
@@ -361,7 +365,7 @@ function mapSpan(x, w){ if (x >= MAP_T) return [x + MAP_DX, w]; if (x + w <= MAP
 function div(cls, css, parent = world){
   if (parent === world && MAP && !css._raw && css.left != null && css.width != null) {
     const L = parseFloat(css.left), W = parseFloat(css.width);
-    if (/disc|pool|glowdot|anchor/.test(cls)) css.left = (mapX(L + W/2) - W/2) + 'px';
+    if (/disc|pool|glowdot|anchor|cshadow/.test(cls)) css.left = (mapX(L + W/2) - W/2) + 'px';
     else { const [nx, nw] = mapSpan(L, W); css.left = nx + 'px'; css.width = nw + 'px'; }
     css.left = (parseFloat(css.left) + OFF) + 'px';
   }
@@ -377,19 +381,24 @@ function box(x, y, w, d, h, col, o = {}){
   if (MAP && !o.parent) { [x, w] = mapSpan(x, w); x += OFF; }
   const b = div('box', {_raw:true, left:x+'px', top:y+'px', width:w+'px', height:d+'px', transform:`translateZ(${o.z||0}px)`}, o.parent||world);
   const f = (css, bg) => div('face', Object.assign(css, {background:bg}), b);
-  const sh = (c, a) => o.noshade ? c : shade(c, a);
-  const F = o.faces || 'tsnwe';   // caras a dibujar (t arriba, s/n/w/e lados). Las caras se ven por ambos lados, así que a un objeto fino le bastan dos.
-  if (F.includes('t') && o.top !== 'transparent') f({left:0,top:0,width:w+'px',height:d+'px',transform:`translateZ(${h}px)`, borderRadius:o.r||0}, o.top || col);
-  if (F.includes('s')) f({left:0,top:(d-h)+'px',width:w+'px',height:h+'px',transformOrigin:'50% 100%',transform:'rotateX(-90deg)'}, o.south || sh(o.side||col,.18));
-  if (F.includes('n')) f({left:0,top:0,width:w+'px',height:h+'px',transformOrigin:'50% 0',transform:'rotateX(90deg)'}, sh(o.side||col,.08));
-  if (F.includes('w')) f({left:0,top:0,width:h+'px',height:d+'px',transformOrigin:'0 50%',transform:'rotateY(-90deg)'}, o.west || sh(o.side||col,.26));
-  if (F.includes('e')) f({left:(w-h)+'px',top:0,width:h+'px',height:d+'px',transformOrigin:'100% 50%',transform:'rotateY(90deg)'}, sh(o.side||col,.34));
+  // Sombreado: cada cara lateral se oscurece hacia el suelo (oclusión ambiental) y la parte de arriba recibe un poco de luz cálida
+  const ao = h >= 14 && !o.noshade;
+  const AO = dir => ao ? `linear-gradient(${dir}, rgba(18,8,4,.34), rgba(18,8,4,.08) 35%, rgba(255,226,180,.06) 85%), ` : '';
+  const sh = (c, a, dir) => o.noshade ? c : AO(dir) + shade(c, a);
+  const topLit = t => (o.noshade || t === 'transparent') ? t : `radial-gradient(120% 120% at 35% 25%, rgba(255,236,205,.10), rgba(0,0,0,.06)), ${t}`;
+  const F = o.faces || ((w <= 30 && d <= 30) ? 'tsw' : 'tsnwe');   // en objetos pequeños bastan dos lados + tapa (menos piezas que pintar)   // caras a dibujar (t arriba, s/n/w/e lados). Las caras se ven por ambos lados, así que a un objeto fino le bastan dos.
+  if (F.includes('t') && o.top !== 'transparent') f({left:0,top:0,width:w+'px',height:d+'px',transform:`translateZ(${h}px)`, borderRadius:o.r||0}, topLit(o.top || col));
+  if (F.includes('s')) f({left:0,top:(d-h)+'px',width:w+'px',height:h+'px',transformOrigin:'50% 100%',transform:'rotateX(-90deg)'}, o.south ? AO('to top') + o.south : sh(o.side||col,.18,'to top'));
+  if (F.includes('n')) f({left:0,top:0,width:w+'px',height:h+'px',transformOrigin:'50% 0',transform:'rotateX(90deg)'}, sh(o.side||col,.08,'to bottom'));
+  if (F.includes('w')) f({left:0,top:0,width:h+'px',height:d+'px',transformOrigin:'0 50%',transform:'rotateY(-90deg)'}, o.west ? AO('to right') + o.west : sh(o.side||col,.26,'to right'));
+  if (F.includes('e')) f({left:(w-h)+'px',top:0,width:h+'px',height:d+'px',transformOrigin:'100% 50%',transform:'rotateY(90deg)'}, sh(o.side||col,.34,'to left'));
   return b;
 }
 function disc(cx, cy, r, z, bg, extra = {}){ return div('disc', Object.assign({left:(cx-r)+'px', top:(cy-r)+'px', width:2*r+'px', height:2*r+'px', background:bg, transform:`translateZ(${z}px)`}, extra)); }
 function plane(x, y, w, d, cls, z = 0){ return div('plane '+cls, {left:x+'px', top:y+'px', width:w+'px', height:d+'px', transform:`translateZ(${z}px)`}); }
+const cshadow = (cx, cy, r, z = 1) => div('cshadow', {left:(cx-r)+'px', top:(cy-r)+'px', width:2*r+'px', height:2*r+'px', transform:`translateZ(${z}px)`});   // sombra de contacto suave
 const pool = (cx, cy, r, z = 1) => div('pool', {left:(cx-r)+'px', top:(cy-r)+'px', width:2*r+'px', height:2*r+'px', transform:`translateZ(${z}px)`});
-const lamp = (cx, cy, z = 235, top = 300) => { box(cx-1, cy-1, 2, 2, top-z, '#1a1a1a', {z, faces:'sw'}); div('glowdot', {left:(cx-9)+'px', top:(cy-9)+'px', width:'18px', height:'18px', transform:`translateZ(${z}px)`}); };
+const lamp = (cx, cy, z = 235, top = 300) => { div('plane', {left:(cx-1)+'px', top:cy+'px', width:'2px', height:(top-z)+'px', background:'#1a1a1a', transformOrigin:'50% 0', transform:`translateZ(${top}px) rotateX(-90deg)`}); /* cable: un solo plano */ div('glowdot', {left:(cx-9)+'px', top:(cy-9)+'px', width:'18px', height:'18px', transform:`translateZ(${z}px)`}); };
 function plant(cx, cy, s = 1, z0 = 0){
   box(cx-12*s, cy-12*s, 24*s, 24*s, 30*s, '#9a5a35', {z:z0});
   [[0,0,20,34],[6,-5,15,48],[-6,6,14,58],[2,2,10,70]].forEach(([dx,dy,r,z],i)=>disc(cx+dx*s, cy+dy*s, r*s, z0+z*s, ['#3f6f4a','#335e3e','#487a52','#3a6844'][i]));
@@ -398,18 +407,19 @@ const LEGS = 'linear-gradient(90deg,#141416 0 3px,transparent 3px calc(100% - 3p
 function chair(x, y, side, z = 0){ // side: dirección del respaldo n,s,e,w
   // silla negra de bistró: patas finas, asiento redondo tapizado y respaldo curvado
   box(x+2, y+2, 18, 18, 40, '#141416', {z, faces:'sw', side:LEGS, noshade:true});
-  disc(x+11, y+11, 12, z+42, 'radial-gradient(circle at 40% 35%,#3a3a3e,#161618)');
+  disc(x+11, y+11, 12, z+42, 'radial-gradient(circle at 40% 35%,#4a4a50,#161618 70%)');
   // sin respaldo: son taburetes bajos
 }
 const MARBLE = 'linear-gradient(115deg, transparent 30%, rgba(140,140,150,.28) 32%, transparent 34%, transparent 62%, rgba(140,140,150,.2) 63%, transparent 65%), radial-gradient(circle at 30% 30%, #f8f7f4, #dcdad5)';
+const PLATES = 'radial-gradient(circle at 34% 38%, #fdfbf7 0 11%, #e9e4da 12%, #fdfbf7 15%, transparent 16%), radial-gradient(circle at 66% 62%, #fdfbf7 0 11%, #e9e4da 12%, #fdfbf7 15%, transparent 16%), ';
 function table(cx, cy, w, d, z = 0, candle = true, round = false){
-  disc(cx, cy, 14, z+1, '#151515');
+  cshadow(cx, cy, Math.max(w, d) * .72, z+1.1);
   box(cx-3, cy-3, 6, 6, 70, '#151515', {z, faces:'sw'});
-  if (w === d && round) disc(cx, cy, w/2, z+72, MARBLE, {boxShadow:'0 0 0 2px rgba(0,0,0,.18)'});
-  else box(cx-w/2, cy-d/2, w, d, 5, '#dcdad4', {z:z+67, top:MARBLE});
+  if (w === d && round) { disc(cx, cy, w/2 + .6, z+69, '#b9b4ab'); disc(cx, cy, w/2, z+72, PLATES + MARBLE); }   // canto del tablero + tablero (platos pintados)
+  else box(cx-w/2, cy-d/2, w, d, 5, '#dcdad4', {z:z+67, top:PLATES + MARBLE});
   if (candle) div('glowdot', {left:(cx-3)+'px', top:(cy-3)+'px', width:'6px', height:'6px', transform:`translateZ(${z+76}px)`, boxShadow:'0 0 10px 4px rgba(242,178,90,.7)'});
 }
-const plate = (cx, cy, z) => disc(cx, cy, 8, z+73, '#fbf8f2');
+const plate = () => {};   // los platos ya van pintados en el tablero
 const sign = (x, y, w, h, z, text, font) => { const s = div('plane', {left:x+'px', top:y+'px', width:w+'px', height:h+'px', transformOrigin:'50% 0', transform:`translateZ(${z}px) rotateX(-90deg)`, backfaceVisibility:'hidden', font, color:'#efe4cf', textAlign:'center', boxSizing:'border-box'}); s.innerHTML = text; return s; };
 
 /* Planta del Bar Bocata (unidades de maqueta)
@@ -424,11 +434,19 @@ plane(0, 880, 1200, 120, 'floor-street');
 box(0, 990, 1200, 10, 6, '#6e6c66');
 
 /* ---------- Planta calle (forjado con sección visible) ---------- */
-const slabTop = 'radial-gradient(circle, rgba(255,232,215,.4) 0 1px, transparent 1.6px) 0 0/7px 7px, radial-gradient(circle, rgba(50,12,6,.4) 0 1px, transparent 1.6px) 3px 4px/9px 9px, radial-gradient(circle, rgba(230,190,160,.3) 0 1.5px, transparent 2px) 5px 1px/13px 11px, #9c4632';
-const TILE = 'repeating-linear-gradient(0deg, rgba(150,120,60,.35) 0 1px, transparent 1px 13px), repeating-linear-gradient(90deg, rgba(150,120,60,.35) 0 1px, transparent 1px 13px), linear-gradient(160deg, rgba(255,255,255,.18), transparent 60%), #ecdfae';
+const slabTop = 'radial-gradient(140% 90% at 50% 40%, rgba(255,214,160,.10), rgba(12,4,2,.22) 100%), linear-gradient(115deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.07) 50%, rgba(255,255,255,0) 60%), radial-gradient(circle, rgba(255,232,215,.4) 0 1px, transparent 1.6px) 0 0/7px 7px, radial-gradient(circle, rgba(50,12,6,.4) 0 1px, transparent 1.6px) 3px 4px/9px 9px, radial-gradient(circle, rgba(230,190,160,.3) 0 1.5px, transparent 2px) 5px 1px/13px 11px, #9c4632';
+const TILE = 'linear-gradient(175deg, rgba(255,255,255,.22), rgba(255,255,255,0) 35%, rgba(255,255,255,.08) 60%, rgba(255,255,255,0) 75%), repeating-linear-gradient(0deg, rgba(150,120,60,.35) 0 1px, transparent 1px 13px), repeating-linear-gradient(90deg, rgba(150,120,60,.35) 0 1px, transparent 1px 13px), linear-gradient(160deg, rgba(255,255,255,.18), transparent 60%), #ecdfae';
 box(360, 470, 300, 410, 75, '#5b534a', {z:LOW, top:slabTop});
 box(480, 360, 180, 110, 75, '#5b534a', {z:LOW, top:slabTop});
 
+
+// Sombra suave en el encuentro del suelo con las paredes (da peso y profundidad)
+MAP = false;
+[[360, 470, 26, 410, 0, 'to right'], [734, 470, 26, 410, 0, 'to left'],
+ [360, -115, 26, 585, LOW, 'to right'], [734, -115, 26, 585, LOW, 'to left'], [360, -115, 400, 26, LOW, 'to bottom']
+].forEach(([x, y, w, d, z, dir]) => div('plane aostrip', {left:x+'px', top:y+'px', width:w+'px', height:d+'px', transform:`translateZ(${z + 0.8}px)`,
+  background:`linear-gradient(${dir}, rgba(20,8,4,.42), rgba(20,8,4,0))`}));
+MAP = true;
 /* ---------- Muros ---------- */
 box(340, -135, 20, 1015, 135, P, {z:LOW, side:TILE, top:'#efe6cf'}).classList.add('wall', 'wall-w');                        // oeste del tubo
 box(660, -135, 20, 615, 135, P, {z:LOW, side:TILE, top:'#efe6cf'}).classList.add('wall', 'wall-e');
@@ -549,6 +567,7 @@ for (let k = 0; k < 6; k++) disc(602, 482 + k*12, 4, 168, 'rgba(230,240,245,.75)
 
 // Taburetes negros de bistró: 5 en el tramo delantero y 2 en el trasero
 [600, 640, 680, 720, 760, 490, 530].forEach(y => {
+  cshadow(535, y, 14, 1.2);
   box(528, y-6, 13, 13, 62, '#141416', {top:'transparent', side:LEGS, noshade:true});
   disc(535, y, 11, 22, 'transparent', {border:'2px solid #141416', boxSizing:'border-box'});
   disc(535, y, 12, 63, 'radial-gradient(circle at 40% 35%,#3a3a3e,#141416)');
@@ -558,6 +577,7 @@ OFF = 0;
 // Personajes: figura alta vestida de negro en la entrada y otra más bajita con camiseta blanca y bigote dentro
 function person(x, y, o){   // x,y = centro en planta (coordenadas finales); mira hacia la calle (sur)
   const SK = o.skin || '#c98f68', L = o.legs, T = o.torso, z0 = o.z || 0;
+  cshadow(x, y+2, 17, z0+1.2);
   box(x-7, y-3, 5, 6, L, o.pants, {z:z0}); box(x+2, y-3, 5, 6, L, o.pants, {z:z0});                // piernas
   box(x-8, y-4, 16, 8, 3, '#111', {z:z0, faces:'ts'});                                                  // zapatos
   box(x-9, y-5, 18, 10, T, o.shirt, {z:z0+L});                                                         // torso
@@ -617,15 +637,17 @@ box(362, 468, 116, 3, 1, '#c9a15a', {z:0});                     // canto del pri
 /* ---------- Planta de abajo (mismo tubo, diáfana) ----------
    Primer tramo ~5 × 7 m: y 145–360. Último tramo: y -115–145 (baño a la izquierda, cocina al fondo, mesa larga a la derecha). */
 plane(362, -115, 296, 585, 'floor-low', LOW);
+const lowStart = world.children.length;   // todo lo que sigue es mobiliario de la planta de abajo
 box(340, -135, 340, 20, 135, P, {z:LOW, side:TILE, top:'#efe6cf'}).classList.add('wall', 'wall-n');                       // pared del fondo
-// Primer tramo: mesa redonda a la derecha
-pool(570, 255, 95, LOW+1);
-box(566, 251, 8, 8, 70, '#2a2a2a', {z:LOW});
-disc(570, 255, 50, LOW+72, 'radial-gradient(#f1ebe0,#dcd3c3)');
-[0,60,120,180,240,300].forEach(a => { const r = 74, t = a*Math.PI/180, x = 570+r*Math.cos(t), y = 255+r*Math.sin(t);
-  const side = Math.abs(Math.cos(t)) > .7 ? (Math.cos(t) > 0 ? 'e' : 'w') : (Math.sin(t) > 0 ? 's' : 'n');
-  chair(x-11, y-11, side, LOW); plate(570+34*Math.cos(t), 255+34*Math.sin(t), LOW); });
-lamp(570, 255, 100, 175);
+// Primer tramo: mesa redonda a la derecha (coordenadas finales, para que ningún taburete quede descolocado)
+MAP = false;
+pool(670, 255, 95, LOW+1); cshadow(670, 255, 60, LOW+1.2);
+box(666, 251, 8, 8, 70, '#2a2a2a', {z:LOW});
+disc(670, 255, 50.6, LOW+69, '#b9b4ab');
+disc(670, 255, 50, LOW+72, 'radial-gradient(circle at 50% 18%, #fdfbf7 0 9%, transparent 10%), radial-gradient(circle at 50% 82%, #fdfbf7 0 9%, transparent 10%), radial-gradient(circle at 20% 50%, #fdfbf7 0 9%, transparent 10%), radial-gradient(circle at 80% 50%, #fdfbf7 0 9%, transparent 10%), ' + MARBLE);
+[0,60,120,180,240,300].forEach(a => { const r = 74, t = a*Math.PI/180, x = 670+r*Math.cos(t), y = 255+r*Math.sin(t); chair(x-11, y-11, 'n', LOW); });
+lamp(670, 255, 100, 175);
+MAP = true;
 // Primer tramo: dos mesas cuadradas para dos a la izquierda
 [[405, 290], [405, 190]].forEach(([cx,cy]) => { pool(cx, cy, 55, LOW+1); table(cx, cy, 44, 44, LOW); plate(cx, cy-10, LOW); plate(cx, cy+10, LOW);
   chair(cx-11, cy-48, 'n', LOW); chair(cx-11, cy+26, 's', LOW); lamp(cx, cy, 100, 175); });
@@ -647,6 +669,7 @@ box(392, -115, 72, 5, 160, '#6a4526', {z:LOW});
 disc(428, -108, 11, LOW+120, 'radial-gradient(#ffe7bf,#f0a54e)');
 sign(392, -110, 72, 18, LOW+178, 'CUINA', '500 10px/18px "IBM Plex Mono", monospace');
 plant(640, 340, .9, LOW);
+[...world.children].slice(lowStart).forEach(n => n.classList.add('lowfx'));   // se oculta cuando estás arriba (no se ve y así hay menos que pintar)
 
 
 
@@ -713,6 +736,7 @@ const dockBtns = [...document.querySelectorAll('.dock [data-go]')];
 function go(key, opts = {}){
   current = key; const c = ZONES[key].cam;
   document.body.classList.toggle('inside', key !== 'overview');
+  document.body.classList.toggle('upstairs', ['entrada','barra','mesas'].includes(key));
   Object.assign(cam, {x:c.x, y:c.y, rx:c.rx, rz:c.rz, h:c.h||0, s:c.z*fit()});
   if (key === 'overview') closePanel(); else if (!opts.silent) openPanel(key);
   apply();
