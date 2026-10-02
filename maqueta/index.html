@@ -75,14 +75,13 @@ button{font:inherit;color:inherit}
 .zone.hot{border-color:rgba(242,178,90,.7);background-color:rgba(242,178,90,.07)}
 .zone.current{border-color:rgba(242,178,90,.95);background-color:rgba(242,178,90,.1)}
 #world .zone{pointer-events:auto;cursor:pointer}
+/* Mientras arrastras o haces zoom se ocultan sombras, halos y viñeta: menos capas que recomponer y el giro va más suelto */
+.dragging .cshadow,.dragging .pool,.dragging .aostrip,.dragging .glowdot,.dragging .zone{visibility:hidden}
+.dragging #grade{opacity:0}
 .frown,.tear{position:absolute;transform-origin:50% 0;backface-visibility:hidden;visibility:hidden}
 .frown{border-top:1.4px solid #2a1712;border-radius:50% 50% 0 0}
 .tear{width:1.6px;height:2.6px;border-radius:50% 50% 50% 50%/30% 30% 70% 70%;background:#6fc3ff;transform:translateZ(var(--z0)) rotateX(-90deg)}
 .crying .crier .frown,.crying .crier .tear{visibility:visible}
-.crying .crier .tear{animation:tear .9s ease-in infinite}
-@keyframes tear{0%{transform:translateZ(var(--z0)) rotateX(-90deg);opacity:1}100%{transform:translateZ(calc(var(--z0) - 11px)) translateY(1px) rotateX(-90deg);opacity:0}}
-.crying .crier .mover{animation:sob .22s ease-in-out infinite alternate}
-@keyframes sob{from{transform:translateZ(0)}to{transform:translateZ(-1.2px) rotateX(-3deg)}}
 #world2 *{pointer-events:none}
 .cut-n #camera2,.inside:not(.upstairs) #camera2{visibility:hidden}   /* desde detrás o en la planta de abajo no se le vería */
 .person,.mover,.legpivot,.leg{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
@@ -90,10 +89,6 @@ button{font:inherit;color:inherit}
 .armpivot,.swing,.raise{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
 .raise{transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
 .clapping .raise{transform:rotateX(172deg)}   /* brazos arriba, por encima de la cabeza */
-.clapping .swing.l{animation:clapL .3s ease-in-out .35s infinite alternate}
-.clapping .swing.r{animation:clapR .3s ease-in-out .35s infinite alternate}
-@keyframes clapL{from{transform:rotateY(4deg)}to{transform:rotateY(19deg)}}
-@keyframes clapR{from{transform:rotateY(-4deg)}to{transform:rotateY(-19deg)}}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
 #confetti i{position:absolute;top:-24px;display:block;border-radius:2px;will-change:transform;animation:fall var(--t) cubic-bezier(.25,.4,.5,1) var(--d) forwards}
 @keyframes fall{to{transform:translate3d(var(--x),112vh,0) rotate(var(--r))}}
@@ -831,6 +826,34 @@ function resetRun(){
   P.arms.forEach(a => a.style.transition = '');
   runnerEl.style.visibility = '';
 }
+// Llanto y aplauso animados fotograma a fotograma según el tiempo (igual que la carrera): en el móvil no se quedan congelados
+function loop(ms, step, end){
+  const t0 = performance.now(); let id = 0, on = true;
+  const f = now => { if (!on) return; const t = (now - t0) / 1000; if (t * 1000 >= ms) { stop(); return; } step(t); id = requestAnimationFrame(f); };
+  const stop = () => { if (!on) return; on = false; cancelAnimationFrame(id); end && end(); };
+  id = requestAnimationFrame(f); return stop;
+}
+let stopCry = () => {}, stopClap = () => {};
+function cryAnim(ms){
+  const mover = crierEl.querySelector('.mover'), tears = [...crierEl.querySelectorAll('.tear')];
+  const z0 = tears.map(t => parseFloat(t.style.getPropertyValue('--z0')));
+  return loop(ms, t => {
+    const k = Math.abs(Math.sin(t * Math.PI / .22));                                           // sollozo
+    mover.style.transform = `translateZ(${-1.2 * k}px) rotateX(${-3 * k}deg)`;
+    tears.forEach((el, i) => {                                                                   // lágrimas que caen
+      const ph = ((t + i * .23) % .9) / .9;
+      el.style.transform = `translateZ(${z0[i] - 11 * ph * ph}px) translateY(${ph}px) rotateX(-90deg)`; el.style.opacity = 1 - ph;
+    });
+  }, () => { mover.style.transform = ''; tears.forEach(el => { el.style.transform = ''; el.style.opacity = ''; }); });
+}
+function clapAnim(ms){
+  const sw = [...document.querySelectorAll('.swing')];
+  return loop(ms, t => {
+    if (t < .35) return;                                                                         // primero levantan los brazos
+    const k = .5 - .5 * Math.cos((t - .35) * Math.PI / .3);
+    sw.forEach(el => { const a = 4 + 15 * k; el.style.transform = `rotateY(${el.classList.contains('l') ? a : -a}deg)`; });
+  }, () => sw.forEach(el => { el.style.transform = ''; }));
+}
 // Horas sin mesa (demo): en la versión real lo diría el motor de reservas
 const FULL = ['21:00', '21:30'];
 // Mientras llora o aplaude, el chico del bigote pasa a la escena aparte (como el de negro) para que su animación no ralentice todo el local
@@ -841,18 +864,18 @@ const seqT = [];
 function runAway(){
   const cl = document.body.classList;
   seqT.splice(0).forEach(clearTimeout);
-  cl.add('upstairs'); cl.remove('clapping', 'runaway', 'crying'); resetRun(); void document.body.offsetWidth;
+  stopCry(); stopClap(); cl.add('upstairs'); cl.remove('clapping', 'runaway', 'crying'); resetRun(); void document.body.offsetWidth;
   // En el móvil el panel tapa media pantalla: lo bajamos durante la escena y vuelve a subir al final con el aviso
   const narrow = innerWidth < 760;
   if (narrow) cl.remove('panel-open');
   cl.add('scene');   // sin marcadores mientras dura la escena
   Object.assign(cam, {x:512, y:702, rx:80, rz:32, h:74, s:13 * fit()}); apply();          // primer plano de la cara
-  seqT.push(setTimeout(() => { lift(6200); cl.add('crying'); }, 700));
+  seqT.push(setTimeout(() => { lift(6200); cl.add('crying'); stopCry = cryAnim(5800); }, 700));
   seqT.push(setTimeout(() => {                                                           // zoom out a la calle
     Object.assign(cam, {x:narrow ? 800 : 880, y:880, rx:56, rz:-8, h:0, s:(narrow ? 1.45 : .82) * fit()}); apply();   // se ven los dos locales
   }, 3400));
   seqT.push(setTimeout(() => { cl.add("runaway"); startRun(); }, 4650));   // cuando la cámara ya ha terminado de alejarse
-  seqT.push(setTimeout(() => cl.remove('crying'), 6500));
+  seqT.push(setTimeout(() => { stopCry(); cl.remove('crying'); }, 6500));
   seqT.push(setTimeout(() => { cl.remove('scene'); if (narrow) { cl.add('panel-open'); apply(); } }, 8600));
 }
 // Confeti: piezas planas en una capa 2D por encima de la maqueta (solo transform, muy ligero) que se borran al acabar
@@ -875,9 +898,9 @@ function celebrate(){
     document.body.classList.add('upstairs'); apply();
   }
   seqT.splice(0).forEach(clearTimeout);
-  const cl = document.body.classList; cl.remove('clapping', 'runaway', 'crying', 'scene'); resetRun(); void document.body.offsetWidth;   // si se había ido corriendo, vuelve a la puerta
-  clearTimeout(clapT); setTimeout(() => { lift(4500); cl.add('clapping'); confetti(); }, 500);
-  clapT = setTimeout(() => cl.remove('clapping'), 4800);
+  stopCry(); const cl = document.body.classList; cl.remove('clapping', 'runaway', 'crying', 'scene'); resetRun(); void document.body.offsetWidth;   // si se había ido corriendo, vuelve a la puerta
+  clearTimeout(clapT); stopClap(); setTimeout(() => { lift(4500); cl.add('clapping'); stopClap = clapAnim(4300); confetti(); }, 500);
+  clapT = setTimeout(() => { stopClap(); cl.remove('clapping'); }, 4800);
 }
 function closePanel(){ document.body.classList.remove('panel-open'); }
 function showForm(key){
@@ -989,7 +1012,7 @@ function enter(){
 function toStreet(){
   entryTimers.splice(0).forEach(clearTimeout);
   seqT.splice(0).forEach(clearTimeout);
-  document.body.classList.remove('arriving', 'dragging', 'runaway', 'clapping', 'crying', 'scene'); resetRun();
+  stopCry(); stopClap(); document.body.classList.remove('arriving', 'dragging', 'runaway', 'clapping', 'crying', 'scene'); resetRun();
   closePanel();
   facade.hidden = false; setInert(true);
   requestAnimationFrame(() => requestAnimationFrame(() => facade.classList.remove('entering','opening')));
