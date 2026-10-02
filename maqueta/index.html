@@ -45,9 +45,9 @@ button{font:inherit;color:inherit}
 #viewport{position:fixed;inset:0;perspective:2000px;perspective-origin:50% 40%;overflow:hidden;cursor:grab;touch-action:none;
   background:radial-gradient(120% 80% at 50% 30%, #26303a 0%, var(--night) 70%)}
 #viewport.grabbing{cursor:grabbing}
-#camera{position:absolute;left:50%;top:48%;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0;
+#camera,#camera2{position:absolute;left:50%;top:48%;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0;
   transition:transform var(--dur) var(--ease);will-change:transform}
-#world{position:absolute;left:-600px;top:-500px;width:1200px;height:1000px;transform-style:preserve-3d}
+#world,#world2{position:absolute;left:-600px;top:-500px;width:1200px;height:1000px;transform-style:preserve-3d}
 #world *{pointer-events:none}
 .box,.obj{position:absolute;transform-style:preserve-3d}
 .face{position:absolute;backface-visibility:visible}
@@ -84,6 +84,10 @@ button{font:inherit;color:inherit}
 @keyframes tear{0%{transform:translateZ(var(--z0)) rotateX(-90deg);opacity:1}100%{transform:translateZ(calc(var(--z0) - 11px)) translateY(1px) rotateX(-90deg);opacity:0}}
 .crying .crier .mover{animation:sob .22s ease-in-out infinite alternate}
 @keyframes sob{from{transform:translateZ(0)}to{transform:translateZ(-1.2px) rotateX(-3deg)}}
+#world2 *{pointer-events:none}
+.cut-n #camera2,.inside:not(.upstairs) #camera2{visibility:hidden}   /* desde detrás o en la planta de abajo no se le vería */
+.runaway .runner{animation:vanish 3.6s steps(1,end) forwards}
+@keyframes vanish{0%,96%{visibility:visible}100%{visibility:hidden}}   /* ya ha entrado por la puerta del Bar Bocata 2 */
 .person,.mover,.legpivot,.leg{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
 /* Sin mesa: el chico de negro se gira y se va corriendo calle abajo */
 .runaway .runner .mover{animation:run 3.6s linear forwards}
@@ -123,9 +127,9 @@ button{font:inherit;color:inherit}
 .pin button::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 4px rgba(242,178,90,.2)}
 .pin button::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:40px;background:linear-gradient(var(--amber),transparent)}
 .pin button:hover,.pin.current button{border-color:var(--amber);background:#2a2217}
-.pin.current button::before{animation:beat 1.6s infinite}
+.pin.current button::before{animation:beat 1.6s 3}   /* late 3 veces y para: una animación infinita obligaba a recomponer toda la escena 3D en cada fotograma */
 @keyframes beat{50%{box-shadow:0 0 0 9px rgba(242,178,90,0)}}
-.dragging #camera{transition:none}
+.dragging #camera,.dragging #camera2{transition:none}
 
 /* ============ UI SUPERPUESTA ============ */
 .topbar{position:fixed;top:0;left:0;right:0;background:linear-gradient(rgba(22,27,33,.85),rgba(22,27,33,0));display:flex;justify-content:space-between;align-items:center;gap:12px;
@@ -324,6 +328,7 @@ form.res .full{grid-column:1/-1}
 <!-- ESCENA -->
 <div id="viewport" aria-label="Maqueta 3D del restaurant. Arrossega per girar; roda o pessic per apropar.">
   <div id="camera"><div id="world"></div></div>
+  <div id="camera2" class="cam"><div id="world2" class="wld"></div></div>
 </div>
 <div id="grade" aria-hidden="true"></div>
 <div id="pins"></div>
@@ -384,7 +389,7 @@ form.res .full{grid-column:1/-1}
 (() => {
 const $ = s => document.querySelector(s);
 document.documentElement.lang = 'ca';
-const world = $('#world'), camera = $('#camera'), vp = $('#viewport'), root = document.documentElement;
+const world = $('#world'), camera = $('#camera'), camera2 = $('#camera2'), world2 = $('#world2'), vp = $('#viewport'), root = document.documentElement;
 
 /* ---------- Constructores de geometría CSS 3D ---------- */
 const shade = (c, a) => `linear-gradient(rgba(0,0,0,${a}),rgba(0,0,0,${a})), ${c}`;
@@ -416,7 +421,7 @@ function box(x, y, w, d, h, col, o = {}){
   const AO = dir => ao ? `linear-gradient(${dir}, rgba(18,8,4,.34), rgba(18,8,4,.08) 35%, rgba(255,226,180,.06) 85%), ` : '';
   const sh = (c, a, dir) => o.noshade ? c : AO(dir) + shade(c, a);
   const topLit = t => (o.noshade || t === 'transparent') ? t : `radial-gradient(120% 120% at 35% 25%, rgba(255,236,205,.10), rgba(0,0,0,.06)), ${t}`;
-  const F = o.faces || ((w <= 30 && d <= 30) ? 'tsw' : 'tsnwe');   // en objetos pequeños bastan dos lados + tapa (menos piezas que pintar)   // caras a dibujar (t arriba, s/n/w/e lados). Las caras se ven por ambos lados, así que a un objeto fino le bastan dos.
+  const F = o.faces || ((w <= 30 && d <= 30 && !o.parent) ? 'tsw' : 'tsnwe');   // las piezas de personajes animados llevan todas las caras: al girar no se ven huecas   // en objetos pequeños bastan dos lados + tapa (menos piezas que pintar)   // caras a dibujar (t arriba, s/n/w/e lados). Las caras se ven por ambos lados, así que a un objeto fino le bastan dos.
   if (F.includes('t') && o.top !== 'transparent') f({left:0,top:0,width:w+'px',height:d+'px',transform:`translateZ(${h}px)`, borderRadius:o.r||0}, topLit(o.top || col));
   if (F.includes('s')) f({left:0,top:(d-h)+'px',width:w+'px',height:h+'px',transformOrigin:'50% 100%',transform:'rotateX(-90deg)'}, o.south ? AO('to top') + o.south : sh(o.side||col,.18,'to top'));
   if (F.includes('n')) f({left:0,top:0,width:w+'px',height:h+'px',transformOrigin:'50% 0',transform:'rotateX(90deg)'}, sh(o.side||col,.08,'to bottom'));
@@ -642,10 +647,11 @@ function person(x, y, o){   // x,y = centro en planta (coordenadas finales); mir
     div('frown', {left:'-2.5px', top:'6.3px', width:'5px', height:'2.4px', transform:`translateZ(${hz+4}px) rotateX(-90deg)`}, m);
     [-2.7, 2.3].forEach((ex, i) => [0, 1].forEach(k => div('tear', {left:ex+'px', top:'6.4px', animationDelay:(k*.45 + i*.2)+'s'}, m).style.setProperty('--z0', (hz+9.5)+'px')));
   }
+  return root;
 }
 MAP = false;
-person(512, 935, {cls:'runner', legs:50, torso:38, pants:'#141416', shirt:'#1b1b1e', sleeve:true, hair:'#2a1a12', skin:'#b8805a'});   // alto, todo de negro, moreno
-person(512, 700, {cls:'crier', legs:34, torso:30, pants:'#3b3f48', shirt:'#f5f3ef', hair:'#3a2a20', skin:'#d29a74', mustache:true});   // bajito, camiseta blanca y bigote
+world2.appendChild(person(512, 935, {cls:'runner', legs:50, torso:38, pants:'#141416', shirt:'#1b1b1e', sleeve:true, hair:'#2a1a12', skin:'#b8805a'}));   // alto, todo de negro, moreno (en su propia escena)
+const crierEl = person(512, 700, {cls:'crier', legs:34, torso:30, pants:'#3b3f48', shirt:'#f5f3ef', hair:'#3a2a20', skin:'#d29a74', mustache:true});   // bajito, camiseta blanca y bigote
 MAP = true;
 // La barra se cierra contra la pared al final del tramo trasero
 MAP = false;
@@ -780,7 +786,8 @@ function apply(){
   const a = cam.rz * Math.PI / 180, vx = Math.sin(a), vy = Math.cos(a);   // dirección desde la que mira la cámara (x este, y sur)
   const cut = (vx < -.6 ? 'w' : '') + (vx > .6 ? 'e' : '') + (vy < -.6 ? 'n' : '');
   if (cut !== lastCut) { const cl = document.body.classList; ['w','e','n'].forEach(k => cl.toggle('cut-' + k, cut.includes(k))); lastCut = cut; }
-  camera.style.transform = `translate3d(${ox}px, ${oy}px, 0) scale(${cam.s}) rotateX(${cam.rx}deg) rotateZ(${cam.rz}deg) translate3d(${600-cam.x}px, ${500-cam.y}px, ${-(cam.h||0)}px)`;
+  // El chico que corre vive en una segunda escena 3D con la misma cámara: así su animación no obliga a reordenar las ~1.000 piezas del local en cada fotograma
+  camera.style.transform = camera2.style.transform = `translate3d(${ox}px, ${oy}px, 0) scale(${cam.s}) rotateX(${cam.rx}deg) rotateZ(${cam.rz}deg) translate3d(${600-cam.x}px, ${500-cam.y}px, ${-(cam.h||0)}px)`;
   kick(document.body.classList.contains('dragging') ? 120 : 1700);
 
 }
@@ -818,6 +825,9 @@ function openPanel(key){
 let clapT;
 // Horas sin mesa (demo): en la versión real lo diría el motor de reservas
 const FULL = ['21:00', '21:30'];
+// Mientras llora o aplaude, el chico del bigote pasa a la escena aparte (como el de negro) para que su animación no ralentice todo el local
+let liftT;
+function lift(ms){ world2.appendChild(crierEl); clearTimeout(liftT); liftT = setTimeout(() => world.appendChild(crierEl), ms); }
 // Sin mesa: 1) zoom a la cara del chico del bigote, que llora; 2) zoom out a la calle; 3) el de negro se va corriendo
 const seqT = [];
 function runAway(){
@@ -825,11 +835,11 @@ function runAway(){
   seqT.splice(0).forEach(clearTimeout);
   cl.add('upstairs'); cl.remove('clapping', 'runaway', 'crying'); void document.body.offsetWidth;
   Object.assign(cam, {x:512, y:702, rx:80, rz:32, h:74, s:13 * fit()}); apply();          // primer plano de la cara
-  seqT.push(setTimeout(() => cl.add('crying'), 700));
+  seqT.push(setTimeout(() => { lift(6200); cl.add('crying'); }, 700));
   seqT.push(setTimeout(() => {                                                           // zoom out a la calle
     Object.assign(cam, {x:880, y:880, rx:56, rz:-8, h:0, s:.82 * fit()}); apply();   // se ven los dos locales
   }, 3400));
-  seqT.push(setTimeout(() => cl.add('runaway'), 4300));
+  seqT.push(setTimeout(() => cl.add("runaway"), 4650));   // cuando la cámara ya ha terminado de alejarse
   seqT.push(setTimeout(() => cl.remove('crying'), 6500));
 }
 // Confeti: piezas planas en una capa 2D por encima de la maqueta (solo transform, muy ligero) que se borran al acabar
@@ -853,7 +863,7 @@ function celebrate(){
   }
   seqT.splice(0).forEach(clearTimeout);
   const cl = document.body.classList; cl.remove('clapping', 'runaway', 'crying'); void document.body.offsetWidth;   // si se había ido corriendo, vuelve a la puerta
-  clearTimeout(clapT); setTimeout(() => { cl.add('clapping'); confetti(); }, 500);
+  clearTimeout(clapT); setTimeout(() => { lift(4500); cl.add('clapping'); confetti(); }, 500);
   clapT = setTimeout(() => cl.remove('clapping'), 4800);
 }
 function closePanel(){ document.body.classList.remove('panel-open'); }
