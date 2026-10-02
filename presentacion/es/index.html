@@ -17,6 +17,7 @@
   --red:#CE112D; --red-soft:#F8E3E6; --red-ink:#8E0A1E;
   --c-res:#1F4F8F; --c-coc:#8A5122; --c-car:#D99A12; --c-rev:#4B852F; --c-eq:#5C2C62;
   --ok:#2A7A4A; --warn:#BF410D; --bubble:#DCF2D6;
+  --ease-out:cubic-bezier(.23,1,.32,1);
   --f:"Archivo","Arial Narrow",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 *{box-sizing:border-box}
@@ -37,13 +38,13 @@ button{font:inherit;color:inherit}
 .top-r{display:flex;align-items:center;gap:10px}
 .count{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
 .ghost{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.9rem}
-.ghost:hover{border-color:var(--red)}
+@media (hover:hover) and (pointer:fine){.ghost:hover{border-color:var(--red)}}
 @media (max-width:620px){.now{display:none}.brand span{display:none}}
 
 /* Slides */
 .stage{position:relative;overflow:hidden}
 .slide{position:absolute;inset:0;overflow-y:auto;padding:clamp(22px,4vh,48px) clamp(16px,5vw,72px);display:none;-webkit-overflow-scrolling:touch}
-.slide.on{display:block;animation:enter .35s cubic-bezier(.2,.8,.2,1)}
+.slide.on{display:block;animation:enter .22s var(--ease-out)}
 @keyframes enter{from{transform:translateX(var(--dir,24px));opacity:.4}to{transform:none;opacity:1}}
 .sl{max-width:1200px;margin:0 auto;min-height:100%;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(24px,4vw,64px);align-items:center}
 .sl.one{grid-template-columns:minmax(0,1fr);align-content:center}
@@ -60,11 +61,9 @@ p{margin:0}
 .area i{width:14px;height:14px;border-radius:4px;background:var(--c)}
 .note{color:var(--muted);font-size:.85rem;margin-top:14px;max-width:56ch}
 .ex{display:inline-block;font-size:.75rem;font-weight:600;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:2px 8px}
-.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 20px;background:var(--red);color:#fff;font-weight:700;cursor:pointer;transition:transform .12s}
-.btn:hover{transform:translateY(-1px)}
-.btn:active{transform:translateY(1px)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 20px;background:var(--red);color:#fff;font-weight:700;cursor:pointer}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 13px;cursor:pointer;font-weight:600;font-size:.88rem;transition:background .15s,color .15s,border-color .15s}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 13px;cursor:pointer;font-weight:600;font-size:.88rem}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .panel{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,2.4vw,28px)}
 .ul{margin:16px 0 0;padding-left:20px;display:grid;gap:6px;max-width:56ch}
@@ -81,13 +80,13 @@ p{margin:0}
 .ticket .th{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;color:var(--muted);border-bottom:2px dashed var(--line);padding-bottom:10px;margin-bottom:10px;font-variant-numeric:tabular-nums}
 .ticket .tt{font-weight:800;font-stretch:75%;font-size:1.35rem;margin-bottom:8px}
 .tl{display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:center;padding:8px 6px;border-radius:8px;border:0;background:transparent;width:100%;text-align:left;cursor:pointer;font-size:.95rem}
-.tl:hover{background:var(--ground)}
+@media (hover:hover) and (pointer:fine){.tl:hover{background:var(--ground)}}
 .tl i{width:12px;height:12px;border-radius:3px;background:var(--c)}
 .tl small{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .ticket .tf{border-top:2px dashed var(--line);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-weight:800}
-.cover .tl{animation:line .4s ease both;animation-delay:calc(var(--i)*90ms + 450ms)}
+.cover .tl{animation:line .3s var(--ease-out) both;animation-delay:calc(var(--i)*60ms + 350ms)}
 @keyframes line{from{transform:translateX(-10px);opacity:0}}
-.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.pop{animation:pop .3s var(--ease-out)}
 @keyframes pop{from{transform:translateX(-14px);background:var(--red-soft)}}
 
 /* Day timeline */
@@ -110,7 +109,7 @@ p{margin:0}
 .grp{border-top:6px solid var(--c);background:var(--paper);border-radius:6px 6px 14px 14px;padding:14px;display:grid;gap:6px;align-content:start}
 .grp h3{font-size:1rem;margin-bottom:4px}
 .svc-link{text-align:left;border:0;background:transparent;padding:7px 8px;border-radius:8px;cursor:pointer;display:grid;grid-template-columns:22px 1fr;gap:6px;font-size:.92rem}
-.svc-link:hover{background:var(--ground)}
+@media (hover:hover) and (pointer:fine){.svc-link:hover{background:var(--ground)}}
 .svc-link b{font-variant-numeric:tabular-nums;color:var(--c)}
 @media (max-width:1000px){.idx{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.idx{grid-template-columns:1fr}}
@@ -130,7 +129,7 @@ p{margin:0}
 .ph-head b{display:block;font-size:.95rem}
 .ph-head small{opacity:.85;font-size:.75rem}
 .ph-body{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:84%;padding:9px 12px;border-radius:14px;font-size:.88rem;line-height:1.35;box-shadow:0 1px 0 rgba(0,0,0,.06);animation:msg .25s ease}
+.msg{max-width:84%;padding:9px 12px;border-radius:14px;font-size:.88rem;line-height:1.35;box-shadow:0 1px 0 rgba(0,0,0,.06);animation:msg .22s var(--ease-out)}
 @keyframes msg{from{transform:translateY(8px);opacity:0}}
 .msg.c{background:var(--paper);align-self:flex-start;border-bottom-left-radius:4px}
 .msg.b{background:var(--bubble);align-self:flex-end;border-bottom-right-radius:4px}
@@ -234,7 +233,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .mi small{display:flex;gap:4px;margin-top:3px}
 .mi small i{font-style:normal;font-size:.62rem;font-weight:800;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--muted)}
 .mi .pr{font-weight:700;font-variant-numeric:tabular-nums;font-size:.9rem;white-space:nowrap}
-.sheet{position:absolute;left:10px;right:10px;bottom:10px;background:var(--ink);color:var(--paper);border-radius:14px;padding:14px;font-size:.88rem;animation:msg .25s ease}
+.sheet{position:absolute;left:10px;right:10px;bottom:10px;background:var(--ink);color:var(--paper);border-radius:14px;padding:14px;font-size:.88rem;animation:msg .22s var(--ease-out)}
 .sheet b{display:block;margin-bottom:4px}
 .sheet .row{display:flex;gap:8px;margin-top:10px}
 .sheet button{border:0;border-radius:999px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:.8rem}
@@ -300,7 +299,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .og h3{font-size:.9rem;display:flex;align-items:center;gap:8px;margin-bottom:2px}
 .og h3 i{width:12px;height:12px;border-radius:3px;background:var(--c)}
 .opt{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:.88rem}
-.opt:hover{background:var(--paper)}
+@media (hover:hover) and (pointer:fine){.opt:hover{background:var(--paper)}}
 .opt input{width:18px;height:18px;accent-color:var(--red);margin:0}
 .opt small{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .build-out{position:sticky;top:0;display:grid;gap:16px}
@@ -337,10 +336,22 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .ov-in h3{margin-bottom:10px}
 .ov-list{display:grid;gap:2px}
 .ov-list button{display:grid;grid-template-columns:30px 1fr;text-align:left;border:0;background:transparent;padding:9px 10px;border-radius:10px;cursor:pointer}
-.ov-list button:hover,.ov-list button[aria-current="true"]{background:var(--ground)}
+.ov-list button[aria-current="true"]{background:var(--ground)}
+@media (hover:hover) and (pointer:fine){.ov-list button:hover{background:var(--ground)}}
 .ov-list b{font-variant-numeric:tabular-nums;color:var(--muted)}
 
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* Press feedback: every pressable confirms the touch */
+.btn,.ghost,.nav-b,.chip,.pick,.time,.step,.rev,.qa button,.mi,.svc-link,button.tl,.langs button,.sheet button,.ov-list button,.opt{transition:transform 160ms var(--ease-out),background-color 150ms ease,border-color 150ms ease,color 150ms ease,box-shadow 150ms ease}
+.btn:active,.ghost:active,.nav-b:not(:disabled):active,.chip:active,.pick:active,.time:active,.step:active,.rev:active,.qa button:active,.mi:active,.svc-link:active,button.tl:active,.langs button:active,.sheet button:active,.ov-list button:active,.opt:active{transform:scale(.97)}
+.dot:active i{transform:scale(.85)}
+@media (hover:hover) and (pointer:fine){.btn:hover{background-color:var(--red-ink)}.chip:not([aria-pressed="true"]):hover,.pick:not([aria-pressed="true"]):hover,.time:not([aria-pressed="true"]):hover,.step:not([aria-pressed="true"]):hover,.rev:not([aria-pressed="true"]):hover,.qa button:not([aria-pressed="true"]):hover,.mi:hover{border-color:var(--muted)}}
+/* Index overlay: quick fade and settle in, instant close */
+.ov:not([hidden]){animation:fade .18s ease}
+.ov:not([hidden]) .ov-in{animation:ovin .22s var(--ease-out)}
+@keyframes fade{from{opacity:0}}
+@keyframes ovin{from{opacity:0;transform:scale(.97)}}
+/* Reduced motion: no movement, keep short fades */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:1ms!important}.slide.on{animation:fade .15s ease!important}}
 </style>
 </head>
 <body>
@@ -770,7 +781,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
     if(typeof i==='string') i=idOf(i);
     i=Math.max(0,Math.min(slides.length-1,i));
     slides[cur].classList.remove('on');
-    slides[i].style.setProperty('--dir',i>=cur?'24px':'-24px');
+    slides[i].style.setProperty('--dir',i>=cur?'12px':'-12px');
     slides[i].classList.add('on'); slides[i].scrollTop=0; cur=i;
     $('now').textContent=slides[i].dataset.t;
     $('count').textContent=(i+1)+' / '+slides.length;
