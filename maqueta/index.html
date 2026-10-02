@@ -398,7 +398,7 @@ function disc(cx, cy, r, z, bg, extra = {}){ return div('disc', Object.assign({l
 function plane(x, y, w, d, cls, z = 0){ return div('plane '+cls, {left:x+'px', top:y+'px', width:w+'px', height:d+'px', transform:`translateZ(${z}px)`}); }
 const cshadow = (cx, cy, r, z = 1) => div('cshadow', {left:(cx-r)+'px', top:(cy-r)+'px', width:2*r+'px', height:2*r+'px', transform:`translateZ(${z}px)`});   // sombra de contacto suave
 const pool = (cx, cy, r, z = 1) => div('pool', {left:(cx-r)+'px', top:(cy-r)+'px', width:2*r+'px', height:2*r+'px', transform:`translateZ(${z}px)`});
-const lamp = (cx, cy, z = 235, top = 300) => { div('plane', {left:(cx-1)+'px', top:cy+'px', width:'2px', height:(top-z)+'px', background:'#1a1a1a', transformOrigin:'50% 0', transform:`translateZ(${top}px) rotateX(-90deg)`}); /* cable: un solo plano */ div('glowdot', {left:(cx-9)+'px', top:(cy-9)+'px', width:'18px', height:'18px', transform:`translateZ(${z}px)`}); };
+const lamp = (cx, cy, z = 235, top = 300) => { div('plane', {left:(cx-1)+'px', top:cy+'px', width:'2px', height:(top-z)+'px', background:'#1a1a1a', transformOrigin:'50% 0', transform:`translateZ(${top}px) rotateX(-90deg)`}); /* cable: un solo plano */ disc(cx, cy, 8, z, 'radial-gradient(circle at 40% 35%, #4a4a4a, #161616 75%)'); };   // pantalla de la lámpara (sin punto brillante que parezca un reflejo en la mesa)
 function plant(cx, cy, s = 1, z0 = 0){
   box(cx-12*s, cy-12*s, 24*s, 24*s, 30*s, '#9a5a35', {z:z0});
   [[0,0,20,34],[6,-5,15,48],[-6,6,14,58],[2,2,10,70]].forEach(([dx,dy,r,z],i)=>disc(cx+dx*s, cy+dy*s, r*s, z0+z*s, ['#3f6f4a','#335e3e','#487a52','#3a6844'][i]));
@@ -417,7 +417,6 @@ function table(cx, cy, w, d, z = 0, candle = true, round = false){
   box(cx-3, cy-3, 6, 6, 70, '#151515', {z, faces:'sw'});
   if (w === d && round) { disc(cx, cy, w/2 + .6, z+69, '#b9b4ab'); disc(cx, cy, w/2, z+72, PLATES + MARBLE); }   // canto del tablero + tablero (platos pintados)
   else box(cx-w/2, cy-d/2, w, d, 5, '#dcdad4', {z:z+67, top:PLATES + MARBLE});
-  if (candle) div('glowdot', {left:(cx-3)+'px', top:(cy-3)+'px', width:'6px', height:'6px', transform:`translateZ(${z+76}px)`, boxShadow:'0 0 10px 4px rgba(242,178,90,.7)'});
 }
 const plate = () => {};   // los platos ya van pintados en el tablero
 const sign = (x, y, w, h, z, text, font) => { const s = div('plane', {left:x+'px', top:y+'px', width:w+'px', height:h+'px', transformOrigin:'50% 0', transform:`translateZ(${z}px) rotateX(-90deg)`, backfaceVisibility:'hidden', font, color:'#efe4cf', textAlign:'center', boxSizing:'border-box'}); s.innerHTML = text; return s; };
