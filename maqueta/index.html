@@ -75,6 +75,14 @@ button{font:inherit;color:inherit}
 .zone.hot{border-color:rgba(242,178,90,.7);background-color:rgba(242,178,90,.07)}
 .zone.current{border-color:rgba(242,178,90,.95);background-color:rgba(242,178,90,.1)}
 #world .zone{pointer-events:auto;cursor:pointer}
+.armpivot,.swing,.raise{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
+.raise{transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.clapping .raise{transform:rotateX(82deg)}
+.clapping .swing.l{animation:clapL .3s ease-in-out .35s infinite alternate}
+.clapping .swing.r{animation:clapR .3s ease-in-out .35s infinite alternate}
+@keyframes clapL{from{transform:rotateZ(-6deg)}to{transform:rotateZ(-21deg)}}
+@keyframes clapR{from{transform:rotateZ(6deg)}to{transform:rotateZ(21deg)}}
+
 .upstairs .lowfx{visibility:hidden}
 /* Corte tipo casa de muñecas: la pared que queda entre la cámara y la sala se oculta (se ve mejor y hay mucho menos que pintar) */
 .cut-w .wall-w,.cut-e .wall-e,.cut-n .wall-n{visibility:hidden}
@@ -581,7 +589,14 @@ function person(x, y, o){   // x,y = centro en planta (coordenadas finales); mir
   box(x-8, y-4, 16, 8, 3, '#111', {z:z0, faces:'ts'});                                                  // zapatos
   box(x-9, y-5, 18, 10, T, o.shirt, {z:z0+L});                                                         // torso
   const arm = o.sleeve ? o.shirt : SK;
-  [x-13, x+9].forEach(ax => { box(ax, y-3, 4, 6, T*.35, o.shirt, {z:z0+L+T*.65}); box(ax, y-3, 4, 6, T*.65, arm === o.shirt ? o.shirt : SK, {z:z0+L+2}); });
+  // Brazos articulados en el hombro: .swing gira hacia dentro (aplauso) y .raise los levanta hacia delante
+  [[x-13, 'l'], [x+9, 'r']].forEach(([ax, side]) => {
+    const g = div('armpivot', {left:(ax+2)+'px', top:y+'px', width:'0px', height:'0px', transform:`translateZ(${z0+L+T-1}px)`});
+    const sw = div('swing ' + side, {}, g), rs = div('raise', {}, sw);
+    box(-2, -3, 4, 6, T*.35, o.shirt, {parent:rs, z:-T*.35});
+    box(-2, -3, 4, 6, T*.62, arm, {parent:rs, z:-T+1});
+    box(-2.2, -3.2, 4.4, 6.4, 5, SK, {parent:rs, z:-T-3});                                          // mano
+  });
   const hz = z0 + L + T;
   box(x-3, y-3, 6, 6, 3, SK, {z:hz, faces:'sw'});                                                      // cuello
   box(x-6, y-6, 12, 12, 14, SK, {z:hz+3, top:o.hair});                                                 // cabeza
@@ -761,6 +776,17 @@ function openPanel(key){
   document.body.classList.add('panel-open');
   const rb = $('#resBtn'); if (rb) rb.addEventListener('click', () => showForm(key));
 }
+// Reserva hecha: la cámara enfoca a los dos personajes y se ponen a aplaudir
+let clapT;
+function celebrate(){
+  if (!['entrada','barra','mesas'].includes(current)) {
+    const c = ZONES.entrada.cam; Object.assign(cam, {x:c.x, y:c.y, rx:c.rx, rz:c.rz, h:0, s:c.z*fit()});
+    document.body.classList.add('upstairs'); apply();
+  }
+  const cl = document.body.classList; cl.remove('clapping'); void document.body.offsetWidth;
+  clearTimeout(clapT); setTimeout(() => cl.add('clapping'), 500);
+  clapT = setTimeout(() => cl.remove('clapping'), 4800);
+}
 function closePanel(){ document.body.classList.remove('panel-open'); }
 function showForm(key){
   const slot = $('#resSlot'); if (!slot || slot.firstChild) return;
@@ -776,6 +802,7 @@ function showForm(key){
     <p class="note full">Prototip: aquí es connectaria el motor de reserves del restaurant.</p></form>`;
   $('#resForm').addEventListener('submit', e => {
     e.preventDefault();
+    celebrate();
     const d = new Date($('#rDate').value+'T12:00').toLocaleDateString('ca-ES',{weekday:'long',day:'numeric',month:'long'});
     e.target.innerHTML = `<div class="ok">Taula per a <b>${$('#rPax').value}</b> a la <b>${$('#rZone').value.toLowerCase()}</b>, ${d} a les <b>${$('#rTime').value}</b>. <br><span class="note">A la versió real, aquí arribaria la confirmació.</span></div>`;
   });
