@@ -232,6 +232,7 @@
   }
   .pin-tile-inner{
     position:relative; width:100%;
+    display:grid; grid-template-columns:minmax(0,1fr);
     transform-style:preserve-3d;
     transition:transform .6s cubic-bezier(.4,.15,.2,1);
     border-radius:16px;
@@ -241,12 +242,15 @@
     backface-visibility:hidden; -webkit-backface-visibility:hidden;
     border-radius:16px; overflow:hidden;
   }
+  /* Foto y reverso comparten celda: la ficha mide lo que mida el mayor de los dos,
+     asi la descripcion + alergenos siempre caben detras aunque la foto sea baja. */
+  .pin-tile-front, .pin-tile-back{ grid-area:1 / 1; align-self:stretch; justify-self:stretch; width:100%; min-width:0; }
   .pin-tile-front{ position:relative; line-height:0; }
-  .pin-tile-front img{
-    width:100%; height:auto; object-fit:cover; display:block;
+  .pin-tile-front img:not(.pin-flip-icon){
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
     transition:transform .35s ease;
   }
-  .pin-tile:active .pin-tile-front img{ transform:scale(1.03); }
+  .pin-tile:active .pin-tile-front img:not(.pin-flip-icon){ transform:scale(1.03); }
   .pin-tile-front::after{
     content:''; position:absolute; inset:0;
     background:linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(10,8,6,.55) 100%);
@@ -264,7 +268,9 @@
      clase "flipped" el icono desaparece de verdad, sin depender del navegador. */
   .pin-tile.flipped .pin-flip-icon{ opacity:0; }
   .pin-tile-front svg.pin-star-icon{
-    position:absolute; top:8px; left:8px; width:22px; height:22px;
+    position:absolute; top:-4px; left:-4px; width:22px; height:22px;
+    box-sizing:content-box; padding:12px; /* zona tactil ampliada (~46px), el dibujo sigue en 8px */
+    -webkit-tap-highlight-color:transparent;
     fill:rgba(20,16,12,.35); stroke:#fff; stroke-width:1.4;
     filter:drop-shadow(0 1px 3px rgba(0,0,0,.65)) drop-shadow(0 0 2px rgba(0,0,0,.5));
     cursor:pointer; z-index:3;
@@ -282,8 +288,8 @@
     background:#FFCC33; color:#3a2a00; border-color:#E8A800;
   }
   .pin-ph{
-    width:100%; display:flex; align-items:flex-end; justify-content:center;
-    position:relative; overflow:hidden;
+    position:absolute; inset:0; width:100%; height:100%; display:flex; align-items:flex-end; justify-content:center;
+    overflow:hidden;
   }
   .pin-ph::before{
     content:''; position:absolute; inset:0;
@@ -319,7 +325,7 @@
     background:rgba(255,255,255,.14); margin:4px 2px;
   }
   .pin-tile-back{
-    position:absolute; inset:0; transform:rotateY(180deg);
+    transform:rotateY(180deg);
     background:var(--card-dark);
     box-shadow:0 10px 24px -14px rgba(0,0,0,.7);
     padding:12px; display:flex; flex-direction:column;
@@ -327,9 +333,8 @@
   .pin-tile-back h4{ margin:0 0 4px; font-size:13px; font-weight:700; color:var(--on-dark); line-height:1.25; font-family:'Inter',sans-serif; }
   .pin-tile-back p{
     margin:0 0 6px; font-size:10.5px; line-height:1.35; color:var(--on-dark-dim);
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
   }
-  .pin-tile-back .allergens{ margin-bottom:4px; max-height:40px; overflow:hidden; gap:3px; }
+  .pin-tile-back .allergens{ margin-bottom:4px; gap:3px; }
   .pin-tile-back .allergen-badge{ padding:2px 6px; font-size:8.5px; }
   .pin-tile-back .price{ font:700 13px 'Inter',sans-serif; color:var(--on-dark); margin:auto 0 4px 0; flex:none; }
   .pin-filter-fab{
@@ -800,17 +805,17 @@ function renderPinGrid(){
     tile.className = 'pin-tile';
     const ratio = pinAspectRatio(d, i);
     const frontHtml = realSrc
-      ? `<img src="${realSrc}" alt="${d[lang].name}" loading="lazy" style="aspect-ratio:${ratio}">`
+      ? `<img src="${realSrc}" alt="${d[lang].name}" loading="lazy">`
       : (()=>{
           const bg = d.bg || '#B8562F';
-          return `<div class="pin-ph" style="aspect-ratio:${ratio};--ph-a:${shadeColor(bg,25)};--ph-b:${shadeColor(bg,-70)}">
+          return `<div class="pin-ph" style="--ph-a:${shadeColor(bg,25)};--ph-b:${shadeColor(bg,-70)}">
             <span class="pin-ph-emoji">${d.emoji || '🍽️'}</span>
           </div>`;
         })();
     const isFav = favorites.has(d.es.name);
     tile.innerHTML = `
       <div class="pin-tile-inner">
-        <div class="pin-tile-front">
+        <div class="pin-tile-front" style="aspect-ratio:${ratio}">
           ${frontHtml}
           <svg class="pin-star-icon${isFav ? ' fav-active' : ''}" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"></path>
