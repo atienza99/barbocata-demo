@@ -390,6 +390,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:1ms!important}.slide.on{animation:fade .15s ease!important}}
 
 [hidden]{display:none!important}img{max-width:100%}
+#calendari .slider .t{gap:4px 12px;flex-wrap:wrap}
 @media (min-width:881px){#f1-picks{grid-template-columns:repeat(2,minmax(0,1fr))}#f1-picks .pick:last-child{grid-column:1/-1}}
 /* Roadmap */
 .phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}
@@ -407,15 +408,17 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .fade{animation:fade .28s var(--ease-out) both}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}}
 .lnk{color:var(--red-ink);font-weight:700}
-.gantt{display:grid;grid-template-columns:minmax(120px,190px) repeat(10,minmax(0,1fr));gap:4px 3px;align-items:center;font-size:.86rem}
+.gantt{display:grid;grid-template-columns:minmax(120px,190px) repeat(9,minmax(0,1fr));gap:4px 3px;align-items:center;font-size:.86rem}
 .gantt .gh{font-size:.75rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums;padding-bottom:4px;border-radius:6px}
 .gantt .gh.on{background:var(--red);color:#fff}
+.gantt .gh small{display:block;font-size:.68rem;opacity:.85}
+@media (max-width:700px){.gantt .gh small{display:none}}
 .gantt .gn{font-weight:700;padding-right:8px;line-height:1.2}
 .gantt .gb{height:30px;border-radius:7px;background:var(--c);color:#fff;font-size:.74rem;font-weight:700;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.35;transition:opacity .2s,transform .2s var(--ease-out)}
 .gantt .gb.on{opacity:1;transform:scaleY(1.08)}
 .gantt .gcol{grid-row:1/-1;border-radius:8px;background:var(--red-soft);z-index:0;transition:grid-column .2s}
 .gantt > :not(.gcol){position:relative;z-index:1}
-@media (max-width:700px){.gantt{grid-template-columns:86px repeat(10,minmax(0,1fr));font-size:.76rem}.gantt .gb{font-size:0;padding:0}.gantt .gn{font-size:.74rem}}
+@media (max-width:700px){.gantt{grid-template-columns:86px repeat(9,minmax(0,1fr));font-size:.76rem}.gantt .gb{font-size:0;padding:0}.gantt .gn{font-size:.74rem}}
 .steps-ol{list-style:none;counter-reset:s;padding:0;margin:20px 0 0;display:grid;gap:12px;max-width:56ch}
 .steps-ol li{counter-increment:s;position:relative;padding-left:46px;min-height:34px;padding-top:4px}
 .steps-ol li::before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-stretch:72%}
@@ -492,7 +495,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
         <div class="ticket" aria-label="Les tres fases">
           <div class="th"><span>Bar Bocata</span><span>Full de ruta</span></div>
           <div class="tt">Comanda per fases</div>
-          <button class="tl" type="button" data-go="fase1" style="--c:var(--red);--i:0"><i></i><span>Fase 1: el panell i el client</span><small>10–12 setm.</small></button>
+          <button class="tl" type="button" data-go="fase1" style="--c:var(--red);--i:0"><i></i><span>Fase 1: el panell i el client</span><small>7 oct – 4 des</small></button>
           <button class="tl" type="button" data-go="fase2" style="--c:var(--c-coc);--i:1"><i></i><span>Fase 2: cuina i compres</span><small>6–8 setm.</small></button>
           <button class="tl" type="button" data-go="fase3" style="--c:var(--c-eq);--i:2"><i></i><span>Fase 3: la resta</span><small>a mida</small></button>
           <div class="tf"><span>Entre fases</span><span>revisem i decidim</span></div>
@@ -514,7 +517,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
     <section class="slide" id="fase1" data-t="Fase 1">
       <div class="sl">
         <div>
-          <p class="area"><i style="--c:var(--red)"></i>Fase 1, unes 10–12 setmanes</p>
+          <p class="area"><i style="--c:var(--red)"></i>Fase 1, del 7 d’octubre al 4 de desembre</p>
           <h2>El panell i la relació amb el client</h2>
           <p class="lead">Cinc peces que es fan servir cada dia i que es controlen totes des del mateix panell. Toca cadascuna per veure què inclou.</p>
           <div class="picks" id="f1-picks"></div>
@@ -531,10 +534,10 @@ input[type=range]{width:100%;accent-color:var(--red)}
           <p class="lead">Mou la barra per veure què passa cada setmana.</p>
           <div class="panel" style="margin-top:18px">
             <div class="gantt" id="gantt"></div>
-            <div class="slider" style="margin-top:18px"><div class="t"><label for="wk">Setmana</label><output id="wk-o" for="wk">1</output></div><input type="range" id="wk" min="1" max="10" step="1" value="1"></div>
+            <div class="slider" style="margin-top:18px"><div class="t"><label for="wk">Setmana</label><output id="wk-o" for="wk">1 · 7–13 d’octubre</output></div><input type="range" id="wk" min="1" max="9" step="1" value="1"></div>
             <p id="wk-t" aria-live="polite" style="margin-top:12px;font-size:1.05rem;max-width:70ch"></p>
           </div>
-          <p class="note">Calendari orientatiu. Les dates exactes les fixem junts la primera setmana.</p>
+          <p class="note">El dilluns 12 d’octubre i el dimarts 8 de desembre són festius.</p>
         </div>
       </div>
     </section>
@@ -588,7 +591,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
         <div>
           <p class="area"><i style="--c:var(--red)"></i>Fase 1</p>
           <h2>Com sabrem que funciona</h2>
-          <p class="lead">La primera setmana mesurem com esteu ara. A la setmana 10 ho comparem i ho veiem junts.</p>
+          <p class="lead">La primera setmana mesurem com esteu ara. A la revisió del 4 de desembre ho comparem i ho veiem junts.</p>
           <div class="kpis">
             <div class="kpi"><b>Converses resoltes sense ajuda</b><span>Quantes consultes respon l’assistent sense passar-les a l’equip.</span></div>
             <div class="kpi"><b>Reserves per WhatsApp i web</b><span>Quantes reserves entren soles, sense trucades.</span></div>
@@ -670,8 +673,8 @@ input[type=range]{width:100%;accent-color:var(--red)}
         </div>
         <div class="panel">
           <ol class="steps-ol big">
-            <li><b>Confirmeu el full de ruta</b> i fixem junts la data d’inici.</li>
-            <li><b>Ens passeu els accessos i la informació</b> de la llista «Què necessitem».</li>
+            <li><b>Confirmeu el full de ruta.</b> Comencem el dimecres 7 d’octubre.</li>
+            <li><b>Ens passeu els accessos i la informació</b> de la llista «Què necessitem» la primera setmana, començant per Meta Business.</li>
             <li><b>Fem la sessió de diagnòstic</b> a Travessera i a Diagonal.</li>
             <li><b>Comencem la fase 1.</b> Us anirem ensenyant els avenços cada setmana.</li>
           </ol>
@@ -756,7 +759,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 
   /* Phases overview */
   var PH=[
-    {k:'Fase 1',n:'El panell i el client',d:'unes 10–12 setmanes',c:'var(--red)',go:'fase1',
+    {k:'Fase 1',n:'El panell i el client',d:'del 7 d’octubre al 4 de desembre',c:'var(--red)',go:'fase1',
      t:'El que es fa servir cada dia i veuen els clients. Tot controlat des d’un únic panell.',
      l:['Panell de control','Reserves per WhatsApp','Carta QR en 4 idiomes','Ressenyes de Google amb el vostre to','Web de reserves i esdeveniments']},
     {k:'Fase 2',n:'Cuina i compres',d:'unes 6–8 setmanes',c:'var(--c-coc)',go:'fase2',
@@ -815,28 +818,28 @@ input[type=range]{width:100%;accent-color:var(--red)}
 
   /* Gantt */
   var G=[
-    {n:'Posada en marxa',c:'var(--ink)',b:[[1,1,'Diagnòstic']]},
-    {n:'Panell de control',c:'var(--red)',b:[[2,4,'Muntatge']]},
-    {n:'Carta QR',c:'var(--c-car)',b:[[4,5,'Carta QR']]},
-    {n:'Reserves per WhatsApp',c:'var(--c-res)',b:[[3,4,'Proves amb l’equip'],[5,5,'Pilot a Travessera'],[6,6,'Diagonal'],[7,7,'Ajustos']]},
-    {n:'Ressenyes de Google',c:'var(--c-rev)',b:[[5,7,'Respostes amb el vostre to']]},
-    {n:'Web de reserves',c:'var(--c-res)',b:[[8,8,'Disseny i continguts'],[9,9,'Web en marxa']]},
-    {n:'Formació i revisió',c:'var(--c-eq)',b:[[10,10,'Revisió']]}
+    {n:'Posada en marxa',c:'var(--ink)',b:[[1,1,'Accessos i diagnòstic']]},
+    {n:'Panell de control',c:'var(--red)',b:[[1,3,'Muntatge']]},
+    {n:'Reserves per WhatsApp',c:'var(--c-res)',b:[[2,2,'Muntatge'],[3,3,'Proves amb l’equip'],[4,4,'Pilot a Travessera'],[5,5,'Diagonal'],[6,6,'Ajustos']]},
+    {n:'Carta QR',c:'var(--c-car)',b:[[3,4,'Carta QR']]},
+    {n:'Ressenyes de Google',c:'var(--c-rev)',b:[[4,6,'Respostes amb el vostre to']]},
+    {n:'Web de reserves',c:'var(--c-res)',b:[[7,7,'Disseny i continguts'],[8,8,'Web en marxa']]},
+    {n:'Formació i revisió',c:'var(--c-eq)',b:[[9,9,'Revisió']]}
   ];
-  var WK=['Recollim accessos, carta, fitxes d’al·lèrgens, normes i exemples de to. Sessió de diagnòstic a cada local.',
-    'Comencem a muntar el panell: locals, usuaris i avisos.',
-    'Seguim amb el panell i comencem les proves del WhatsApp amb l’equip.',
-    'Última setmana de muntatge del panell. Comencem la carta QR amb els vostres plats i preus. L’equip prova l’assistent amb preguntes reals.',
+  var WD=[['7/10','7–13 d’octubre'],['14/10','14–20 d’octubre'],['21/10','21–27 d’octubre'],['28/10','28 d’octubre – 3 de novembre'],['4/11','4–10 de novembre'],['11/11','11–17 de novembre'],['18/11','18–24 de novembre'],['25/11','25 de novembre – 1 de desembre'],['2/12','2–8 de desembre']];
+  var WK=['Comencem a muntar el panell. A la vegada recollim accessos, carta, fitxes d’al·lèrgens, normes i exemples de to, i fem la sessió de diagnòstic a cada local.',
+    'Seguim amb el panell i muntem l’assistent de WhatsApp.',
+    'Última setmana de muntatge del panell. Comencem la carta QR amb els vostres plats i preus. L’equip prova l’assistent de WhatsApp amb preguntes reals.',
     'Carta QR en marxa. WhatsApp obert als clients de Travessera, amb l’encarregat revisant les converses. Comencem a preparar el to de les ressenyes.',
     'WhatsApp també a Diagonal. Primeres respostes a ressenyes per aprovar.',
     'Ajustos amb el que hem après. Ressenyes en marxa als dos locals.',
     'Muntem la web de reserves i esdeveniments amb les vostres fotos, textos i l’agenda dels propers mesos.',
     'Web publicada i connectada al panell: les reserves de la web entren amb les del WhatsApp.',
-    'Formació de l’equip, revisió de resultats i decisió sobre la fase 2.'];
+    'Formació de l’equip i revisió de resultats. El divendres 4 de desembre ens reunim per decidir sobre la fase 2.'];
   var gt=$('gantt'), gcol=el('div','gcol'), bars=[], ghs=[];
   gt.appendChild(gcol);
   gt.appendChild(el('div','gn',''));
-  for(var w=1;w<=10;w++){var h=el('div','gh','S'+w); h.style.gridColumn=(w+1); h.style.gridRow=1; ghs.push(h); gt.appendChild(h);}
+  for(var w=1;w<=9;w++){var h=el('div','gh','S'+w+'<small>'+WD[w-1][0]+'</small>'); h.style.gridColumn=(w+1); h.style.gridRow=1; ghs.push(h); gt.appendChild(h);}
   G.forEach(function(r,ri){
     var n=el('div','gn'); n.textContent=r.n; n.style.gridRow=ri+2; n.style.gridColumn=1; gt.appendChild(n);
     r.b.forEach(function(b){
@@ -847,7 +850,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
   });
   gcol.style.gridRow='1 / '+(G.length+2);
   function setWk(v){
-    v=+v; $('wk-o').textContent=v; $('wk-t').textContent=WK[v-1];
+    v=+v; $('wk-o').textContent=v+' · '+WD[v-1][1]; $('wk-t').textContent=WK[v-1];
     gcol.style.gridColumn=(v+1)+' / '+(v+2);
     ghs.forEach(function(h,i){h.classList.toggle('on',i===v-1);});
     bars.forEach(function(d){d.classList.toggle('on',v>=d._a&&v<=d._b);});
