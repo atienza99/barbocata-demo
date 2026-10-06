@@ -390,6 +390,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:1ms!important}.slide.on{animation:fade .15s ease!important}}
 
 [hidden]{display:none!important}img{max-width:100%}
+@media (min-width:881px){#f1-picks{grid-template-columns:repeat(2,minmax(0,1fr))}#f1-picks .pick:last-child{grid-column:1/-1}}
 /* Roadmap */
 .phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}
 .ph{border:1px solid var(--line);background:var(--paper);border-radius:16px;padding:16px 16px 14px;text-align:left;cursor:pointer;display:grid;gap:4px;position:relative;overflow:hidden;transition:transform .16s var(--ease-out),border-color .16s}
@@ -406,7 +407,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .fade{animation:fade .28s var(--ease-out) both}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}}
 .lnk{color:var(--red-ink);font-weight:700}
-.gantt{display:grid;grid-template-columns:minmax(120px,190px) repeat(8,minmax(0,1fr));gap:4px 3px;align-items:center;font-size:.86rem}
+.gantt{display:grid;grid-template-columns:minmax(120px,190px) repeat(10,minmax(0,1fr));gap:4px 3px;align-items:center;font-size:.86rem}
 .gantt .gh{font-size:.75rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums;padding-bottom:4px;border-radius:6px}
 .gantt .gh.on{background:var(--red);color:#fff}
 .gantt .gn{font-weight:700;padding-right:8px;line-height:1.2}
@@ -414,7 +415,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
 .gantt .gb.on{opacity:1;transform:scaleY(1.08)}
 .gantt .gcol{grid-row:1/-1;border-radius:8px;background:var(--red-soft);z-index:0;transition:grid-column .2s}
 .gantt > :not(.gcol){position:relative;z-index:1}
-@media (max-width:700px){.gantt{grid-template-columns:86px repeat(8,minmax(0,1fr));font-size:.76rem}.gantt .gb{font-size:0;padding:0}.gantt .gn{font-size:.74rem}}
+@media (max-width:700px){.gantt{grid-template-columns:86px repeat(10,minmax(0,1fr));font-size:.76rem}.gantt .gb{font-size:0;padding:0}.gantt .gn{font-size:.74rem}}
 .steps-ol{list-style:none;counter-reset:s;padding:0;margin:20px 0 0;display:grid;gap:12px;max-width:56ch}
 .steps-ol li{counter-increment:s;position:relative;padding-left:46px;min-height:34px;padding-top:4px}
 .steps-ol li::before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-stretch:72%}
@@ -491,7 +492,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
         <div class="ticket" aria-label="Les tres fases">
           <div class="th"><span>Bar Bocata</span><span>Full de ruta</span></div>
           <div class="tt">Comanda per fases</div>
-          <button class="tl" type="button" data-go="fase1" style="--c:var(--red);--i:0"><i></i><span>Fase 1: el panell i el client</span><small>8–10 setm.</small></button>
+          <button class="tl" type="button" data-go="fase1" style="--c:var(--red);--i:0"><i></i><span>Fase 1: el panell i el client</span><small>10–12 setm.</small></button>
           <button class="tl" type="button" data-go="fase2" style="--c:var(--c-coc);--i:1"><i></i><span>Fase 2: cuina i compres</span><small>6–8 setm.</small></button>
           <button class="tl" type="button" data-go="fase3" style="--c:var(--c-eq);--i:2"><i></i><span>Fase 3: la resta</span><small>a mida</small></button>
           <div class="tf"><span>Entre fases</span><span>revisem i decidim</span></div>
@@ -513,9 +514,9 @@ input[type=range]{width:100%;accent-color:var(--red)}
     <section class="slide" id="fase1" data-t="Fase 1">
       <div class="sl">
         <div>
-          <p class="area"><i style="--c:var(--red)"></i>Fase 1, unes 8–10 setmanes</p>
+          <p class="area"><i style="--c:var(--red)"></i>Fase 1, unes 10–12 setmanes</p>
           <h2>El panell i la relació amb el client</h2>
-          <p class="lead">Quatre peces que es fan servir cada dia i que es controlen totes des del mateix panell. Toca cadascuna per veure què inclou.</p>
+          <p class="lead">Cinc peces que es fan servir cada dia i que es controlen totes des del mateix panell. Toca cadascuna per veure què inclou.</p>
           <div class="picks" id="f1-picks"></div>
         </div>
         <div class="panel" id="f1-x" aria-live="polite"></div>
@@ -530,7 +531,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
           <p class="lead">Mou la barra per veure què passa cada setmana.</p>
           <div class="panel" style="margin-top:18px">
             <div class="gantt" id="gantt"></div>
-            <div class="slider" style="margin-top:18px"><div class="t"><label for="wk">Setmana</label><output id="wk-o" for="wk">1</output></div><input type="range" id="wk" min="1" max="8" step="1" value="1"></div>
+            <div class="slider" style="margin-top:18px"><div class="t"><label for="wk">Setmana</label><output id="wk-o" for="wk">1</output></div><input type="range" id="wk" min="1" max="10" step="1" value="1"></div>
             <p id="wk-t" aria-live="polite" style="margin-top:12px;font-size:1.05rem;max-width:70ch"></p>
           </div>
           <p class="note">Calendari orientatiu. Les dates exactes les fixem junts la primera setmana.</p>
@@ -576,7 +577,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
           <p class="area"><i style="--c:var(--red)"></i>Per començar la fase 1</p>
           <h2>Què necessitem de vosaltres</h2>
           <p class="lead">Amb això podem començar. Ho podem anar marcant junts a la reunió.</p>
-          <div class="prog-b" style="margin-top:20px"><div class="row"><b id="ck-n">0 de 8</b><span class="note" style="margin:0">a punt</span></div><div class="bar-o"><i id="ck-bar"></i></div></div>
+          <div class="prog-b" style="margin-top:20px"><div class="row"><b id="ck-n">0 de 9</b><span class="note" style="margin:0">a punt</span></div><div class="bar-o"><i id="ck-bar"></i></div></div>
         </div>
         <div class="panel" id="ck" role="group" aria-label="Llista"></div>
       </div>
@@ -587,13 +588,13 @@ input[type=range]{width:100%;accent-color:var(--red)}
         <div>
           <p class="area"><i style="--c:var(--red)"></i>Fase 1</p>
           <h2>Com sabrem que funciona</h2>
-          <p class="lead">La primera setmana mesurem com esteu ara. A la setmana 8 ho comparem i ho veiem junts.</p>
+          <p class="lead">La primera setmana mesurem com esteu ara. A la setmana 10 ho comparem i ho veiem junts.</p>
           <div class="kpis">
             <div class="kpi"><b>Converses resoltes sense ajuda</b><span>Quantes consultes respon l’assistent sense passar-les a l’equip.</span></div>
-            <div class="kpi"><b>Reserves per WhatsApp</b><span>Quantes reserves entren soles, sense trucades.</span></div>
+            <div class="kpi"><b>Reserves per WhatsApp i web</b><span>Quantes reserves entren soles, sense trucades.</span></div>
             <div class="kpi"><b>Clients que no es presenten</b><span>L’efecte dels recordatoris del dia abans.</span></div>
             <div class="kpi"><b>Ressenyes respostes en 48 hores</b><span>Totes, als dos locals, amb el vostre to.</span></div>
-            <div class="kpi"><b>Visites a la carta QR</b><span>Quins plats es miren més i en quin idioma.</span></div>
+            <div class="kpi"><b>Visites a la carta QR i a la web</b><span>Quins plats es miren més i en quin idioma.</span></div>
           </div>
         </div>
       </div>
@@ -634,7 +635,6 @@ input[type=range]{width:100%;accent-color:var(--red)}
           <div class="mods m3">
             <div class="mod" style="--c:var(--c-car)"><b>Anàlisi de carta per marge</b><span>Quins plats us fan guanyar diners i quins cal revisar.</span></div>
             <div class="mod" style="--c:var(--c-car)"><b>Venda suggerida</b><span>La carta QR proposa l’acompanyament o les postres.</span></div>
-            <div class="mod" style="--c:var(--c-res)"><b>Web de reserves i esdeveniments</b><span>Partits, vermuts, nits temàtiques i grups, amb reserva directa.</span></div>
             <div class="mod" style="--c:var(--c-res)"><b>Grups i sopars d’empresa</b><span>Menú, paga i senyal i factura, sense intervenció.</span></div>
             <div class="mod" style="--c:var(--c-eq)"><b>Previsió de clients i torns</b><span>Quanta gent cal a cada local i a cada franja.</span></div>
             <div class="mod" style="--c:var(--c-eq)"><b>Assistent de cuina i APPCC</b><span>Fitxes, receptes i pla d’higiene al mòbil de l’equip.</span></div>
@@ -756,15 +756,15 @@ input[type=range]{width:100%;accent-color:var(--red)}
 
   /* Phases overview */
   var PH=[
-    {k:'Fase 1',n:'El panell i el client',d:'unes 8–10 setmanes',c:'var(--red)',go:'fase1',
+    {k:'Fase 1',n:'El panell i el client',d:'unes 10–12 setmanes',c:'var(--red)',go:'fase1',
      t:'El que es fa servir cada dia i veuen els clients. Tot controlat des d’un únic panell.',
-     l:['Panell de control','Reserves per WhatsApp','Carta QR en 4 idiomes','Ressenyes de Google amb el vostre to']},
+     l:['Panell de control','Reserves per WhatsApp','Carta QR en 4 idiomes','Ressenyes de Google amb el vostre to','Web de reserves i esdeveniments']},
     {k:'Fase 2',n:'Cuina i compres',d:'unes 6–8 setmanes',c:'var(--c-coc)',go:'fase2',
      t:'Quan el panell ja és del dia a dia: costos, marges i el que cal preparar i demanar.',
      l:['Albarans i factures','Escandalls amb avís de marge','Producció i comandes','Registre de mermes']},
     {k:'Fase 3',n:'La resta',d:'a mida',c:'var(--c-eq)',go:'fase3',
      t:'Les peces que aprofiten tot el que ja funciona, triades i ordenades amb vosaltres.',
-     l:['Anàlisi de carta i venda suggerida','Web de reserves i esdeveniments','Grups, torns i assistent de cuina','Xarxes, opinions i formació']}
+     l:['Anàlisi de carta i venda suggerida','Grups i sopars d’empresa','Torns i assistent de cuina','Xarxes, opinions i formació']}
   ];
   var phHost=$('phases');
   function showPhase(i){
@@ -796,12 +796,15 @@ input[type=range]{width:100%;accent-color:var(--red)}
      l:['Català, castellà, anglès i francès.','Al·lèrgens de cada plat.','Plat del dia i «esgotat» amb un toc.','Un canvi de preu s’aplica a l’instant als dos locals.']},
     {n:'Ressenyes de Google',s:'Amb el vostre to, i vosaltres aproveu',
      t:'Cada ressenya nova arriba al panell amb una proposta de resposta.',
-     l:['La IA escriu com parla Bar Bocata.','No es publica res sense la vostra aprovació.','Responeu a Google des del mateix panell.','Cada correcció millora les respostes següents.']}
+     l:['La IA escriu com parla Bar Bocata.','No es publica res sense la vostra aprovació.','Responeu a Google des del mateix panell.','Cada correcció millora les respostes següents.']},
+    {n:'Web de reserves i esdeveniments',s:'L’última peça de la fase 1',
+     t:'Una web pròpia de Bar Bocata per reservar i veure què passa a cada local.',
+     l:['Reserva directa a Travessera o a Diagonal, en 4 idiomes.','Agenda d’esdeveniments: partits, vermuts, nits temàtiques.','Sol·licituds de grups i celebracions.','Les reserves entren al mateix panell que les del WhatsApp.','Els esdeveniments i les places lliures s’actualitzen des del panell.']}
   ];
   var fp=$('f1-picks');
   function showF1(i){
     var m=F1[i];
-    $('f1-x').innerHTML='<div class="fade"><p class="area" style="margin-bottom:8px"><i style="--c:var(--red)"></i>'+(i+1)+' de 4</p><h3 style="font-size:1.5rem;font-stretch:72%;font-weight:800">'+m.n+'</h3>'+
+    $('f1-x').innerHTML='<div class="fade"><p class="area" style="margin-bottom:8px"><i style="--c:var(--red)"></i>'+(i+1)+' de '+F1.length+'</p><h3 style="font-size:1.5rem;font-stretch:72%;font-weight:800">'+m.n+'</h3>'+
       '<p style="margin-top:8px">'+m.t+'</p><ul class="ul">'+m.l.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul>'+(m.a?'<p style="margin-top:14px">'+m.a+'</p>':'')+'</div>';
   }
   F1.forEach(function(m,i){
@@ -817,7 +820,8 @@ input[type=range]{width:100%;accent-color:var(--red)}
     {n:'Carta QR',c:'var(--c-car)',b:[[2,3,'Carta en marxa']]},
     {n:'Reserves per WhatsApp',c:'var(--c-res)',b:[[3,4,'Proves amb l’equip'],[5,5,'Pilot a Travessera'],[6,6,'Diagonal'],[7,7,'Ajustos']]},
     {n:'Ressenyes de Google',c:'var(--c-rev)',b:[[5,7,'Respostes amb el vostre to']]},
-    {n:'Formació i revisió',c:'var(--c-eq)',b:[[8,8,'Revisió']]}
+    {n:'Web de reserves',c:'var(--c-res)',b:[[8,8,'Disseny i continguts'],[9,9,'Web en marxa']]},
+    {n:'Formació i revisió',c:'var(--c-eq)',b:[[10,10,'Revisió']]}
   ];
   var WK=['Recollim accessos, carta, fitxes d’al·lèrgens, normes i exemples de to. Sessió de diagnòstic a cada local.',
     'Muntem el panell i la carta QR amb els vostres plats i preus.',
@@ -826,11 +830,13 @@ input[type=range]{width:100%;accent-color:var(--red)}
     'WhatsApp obert als clients de Travessera, amb l’encarregat revisant les converses. Comencem a preparar el to de les ressenyes.',
     'WhatsApp també a Diagonal. Primeres respostes a ressenyes per aprovar.',
     'Ajustos amb el que hem après. Ressenyes en marxa als dos locals.',
+    'Muntem la web de reserves i esdeveniments amb les vostres fotos, textos i l’agenda dels propers mesos.',
+    'Web publicada i connectada al panell: les reserves de la web entren amb les del WhatsApp.',
     'Formació de l’equip, revisió de resultats i decisió sobre la fase 2.'];
   var gt=$('gantt'), gcol=el('div','gcol'), bars=[], ghs=[];
   gt.appendChild(gcol);
   gt.appendChild(el('div','gn',''));
-  for(var w=1;w<=8;w++){var h=el('div','gh','S'+w); h.style.gridColumn=(w+1); h.style.gridRow=1; ghs.push(h); gt.appendChild(h);}
+  for(var w=1;w<=10;w++){var h=el('div','gh','S'+w); h.style.gridColumn=(w+1); h.style.gridRow=1; ghs.push(h); gt.appendChild(h);}
   G.forEach(function(r,ri){
     var n=el('div','gn'); n.textContent=r.n; n.style.gridRow=ri+2; n.style.gridColumn=1; gt.appendChild(n);
     r.b.forEach(function(b){
@@ -897,7 +903,8 @@ input[type=range]{width:100%;accent-color:var(--red)}
     ['Fitxes d’al·lèrgens','De cada plat.'],
     ['Horaris i normes de reserva','Terrassa, grups, torns, temps de cortesia.'],
     ['20–30 respostes que us agradin','Per ensenyar el to a la IA.'],
-    ['Qui rep els avisos','Una persona de referència a cada local.']
+    ['Qui rep els avisos','Una persona de referència a cada local.'],
+    ['Fotos i esdeveniments','Per a la web: fotos dels locals i agenda de partits, vermuts o nits temàtiques.']
   ];
   var ckHost=$('ck'), ckDone=0;
   function ckUpd(){
