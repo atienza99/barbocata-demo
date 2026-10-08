@@ -580,7 +580,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
           <p class="area"><i style="--c:var(--red)"></i>Per començar la fase 1</p>
           <h2>Què necessitem de vosaltres</h2>
           <p class="lead">Amb això podem començar. Ho podem anar marcant junts a la reunió.</p>
-          <div class="prog-b" style="margin-top:20px"><div class="row"><b id="ck-n">0 de 9</b><span class="note" style="margin:0">a punt</span></div><div class="bar-o"><i id="ck-bar"></i></div></div>
+          <div class="prog-b" style="margin-top:20px"><div class="row"><b id="ck-n">0 de 3</b><span class="note" style="margin:0">a punt</span></div><div class="bar-o"><i id="ck-bar"></i></div></div>
         </div>
         <div class="panel" id="ck" role="group" aria-label="Llista"></div>
       </div>
@@ -673,7 +673,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
         <div class="panel">
           <ol class="steps-ol big">
             <li><b>Confirmeu el full de ruta.</b> Comencem el dimecres 7 d’octubre.</li>
-            <li><b>Ens passeu els accessos i la informació</b> de la llista «Què necessitem» la primera setmana, començant per Meta Business.</li>
+            <li><b>Ens passeu els accessos i la informació</b> de la llista «Què necessitem» la primera setmana.</li>
             <li><b>Fem la sessió de diagnòstic</b> a Travessera i a Diagonal.</li>
             <li><b>Comencem la fase 1.</b> Us anirem ensenyant els avenços cada setmana.</li>
           </ol>
@@ -898,15 +898,9 @@ input[type=range]{width:100%;accent-color:var(--red)}
 
   /* Checklist */
   var CK=[
-    ['Accés a Meta Business','Per connectar el WhatsApp de cada local.'],
-    ['Google Business Profile','Accés de gestor dels dos locals.'],
-    ['Sistema de reserves actual','Nom del programa o llibreta que feu servir.'],
-    ['Carta actual','Amb preus i menú del dia.'],
-    ['Fitxes d’al·lèrgens','De cada plat.'],
-    ['Horaris i normes de reserva','Terrassa, grups, torns, temps de cortesia.'],
-    ['20–30 respostes que us agradin','Per ensenyar el to a la IA.'],
-    ['Qui rep els avisos','Una persona de referència a cada local.'],
-    ['Fotos i esdeveniments','Per a la web: fotos dels locals i agenda de partits, vermuts o nits temàtiques.']
+    ['Carta i informació dels plats','Carta actual, al·lèrgens, fotos dels plats, descripcions i tota la informació disponible.'],
+    ['Com treballa la recepció','Horaris, normes del negoci, to de l’assistent i, en general, tots els materials i instruccions que donaríeu a una persona nova que comencés a treballar de recepcionista.'],
+    ['Converses de WhatsApp al mes','Saber aproximadament quantes converses de WhatsApp teniu cada mes, sobretot per calcular bé els costos.']
   ];
   var ckHost=$('ck'), ckDone=0;
   function ckUpd(){
