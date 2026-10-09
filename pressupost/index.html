@@ -684,11 +684,11 @@ input[type=range]{width:100%;accent-color:var(--red)}
             <div class="ed-h ed-t"><span>Total</span><span id="ed-th"></span><span id="ed-tp"></span></div>
             <h3 id="ed-qh" style="margin-top:22px">Quota mensual</h3>
             <div class="slider"><div class="t"><label for="ed-m">Marge sobre costos externs</label><output id="ed-m-o" for="ed-m"></output></div><input type="range" id="ed-m" min="0" max="50" step="5"></div>
-            <div class="ed-h qx"><span>Servei</span><span>Costos externs €/mes</span><span>Manteniment h/mes</span><span>Quota</span></div>
+            <div class="ed-h qx"><span>Servei</span><span>Costos externs €/mes</span><span>Manteniment €/mes</span><span>Quota</span></div>
             <div id="ed-qrows"></div>
             <div class="ed-h qx ed-t"><span>Total</span><span id="ed-te"></span><span id="ed-tm"></span><span id="ed-tq"></span></div>
             <div class="chips" style="margin-top:14px"><button class="btn" type="button" id="ed-ok">Fet</button><button class="ghost" type="button" id="ed-reset">Restablir valors</button></div>
-            <p class="note">Preu = hores de feina × 40 €/h, arrodonit a desenes. Quota = costos externs × (1 + marge) + hores de manteniment × 40 €/h. Els canvis es guarden en aquest navegador.</p>
+            <p class="note">Preu = hores de feina × 40 €/h, arrodonit a desenes. Quota = costos externs × (1 + marge) + manteniment i suport. Els canvis es guarden en aquest navegador.</p>
           </div>
         </div>
       </div>
@@ -851,28 +851,28 @@ input[type=range]{width:100%;accent-color:var(--red)}
   var P=[
     {k:'Fase 1',n:'El panell i el client',c:'var(--red)',go:'fase1',s:[
       {n:'Diagnòstic i gestió del projecte',t:M,p:280,q:0,h:0,w:7,inc:'Sessió de diagnòstic a cada local, recollida d’accessos i informació, mesura del punt de partida i seguiment setmanal durant la fase.'},
-      {n:'Panell de control',t:C,p:600,q:47,ext:15,mh:0.75,h:1,w:15,inc:'Panell únic per als dos locals: reserves, converses de WhatsApp, carta i ressenyes. Usuaris per local i avisos al mòbil. És la base on s’afegeixen les fases 2 i 3.',cov:'Servidor i base de dades, còpies de seguretat, actualitzacions i suport.',sv:'Tot en un sol lloc: menys temps buscant reserves i missatges'},
-      {n:'Reserves per WhatsApp',t:M,p:640,q:80,ext:45,mh:0.75,h:7,w:16,inc:'Alta a Meta Business i verificació del número, assistent entrenat amb les vostres normes i horaris, recordatori el dia abans, connexió al panell, proves amb l’equip i pilot.',cov:'Missatges de Meta (recordatoris), ús d’IA, ajustos de l’assistent i suport.',sv:'Respondre trucades i missatges per reservar, confirmar i recordar'},
-      {n:'Llista d’espera i taules alliberades',t:C,p:120,q:16,ext:5,mh:0.25,h:2,w:3,inc:'Regles d’avís quan s’allibera una taula i temps per confirmar, dins l’assistent de WhatsApp.',cov:'Missatges d’avís i manteniment.',sv:'Trucar clients en espera i tornar a omplir taules'},
-      {n:'Carta digital QR en 4 idiomes',t:C,p:240,q:26,ext:5,mh:0.5,h:1,w:6,inc:'Carta amb traduccions (català, castellà, anglès i francès), al·lèrgens, plat del dia i «esgotat»; QR per a les taules dels dos locals.',cov:'Allotjament de la carta i canvis de plats i preus.',sv:'Explicar plats i al·lèrgens i canviar cartes impreses'},
-      {n:'Respostes a ressenyes de Google',t:M,p:200,q:31,ext:10,mh:0.5,h:3,w:5,inc:'Guia de to amb 20–30 exemples, model de resposta per a cada tipus de ressenya, connexió amb Google Business Profile dels dos locals i aprovació des del panell.',cov:'Ús d’IA i millora del to amb les vostres correccions.',sv:'Llegir i contestar ressenyes una a una'},
-      {n:'Web de reserves i esdeveniments',t:M,p:1200,q:31,ext:10,mh:0.5,h:2,w:30,inc:'Disseny propi amb la imatge de Bar Bocata, 4 idiomes, agenda de partits, vermuts i nits temàtiques, sol·licituds de grups i reserva directa connectada al panell.',cov:'Allotjament, domini i altes d’esdeveniments.',sv:'Atendre per telèfon consultes d’esdeveniments i grups'},
+      {n:'Panell de control',t:C,p:600,q:47,ext:15,mm:30,h:1,w:15,inc:'Panell únic per als dos locals: reserves, converses de WhatsApp, carta i ressenyes. Usuaris per local i avisos al mòbil. És la base on s’afegeixen les fases 2 i 3.',cov:'Servidor i base de dades, còpies de seguretat, actualitzacions i suport.',sv:'Tot en un sol lloc: menys temps buscant reserves i missatges'},
+      {n:'Reserves per WhatsApp',t:M,p:640,q:80,ext:45,mm:30,h:7,w:16,inc:'Alta a Meta Business i verificació del número, assistent entrenat amb les vostres normes i horaris, recordatori el dia abans, connexió al panell, proves amb l’equip i pilot.',cov:'Missatges de Meta (recordatoris), ús d’IA, ajustos de l’assistent i suport.',sv:'Respondre trucades i missatges per reservar, confirmar i recordar'},
+      {n:'Llista d’espera i taules alliberades',t:C,p:120,q:16,ext:5,mm:10,h:2,w:3,inc:'Regles d’avís quan s’allibera una taula i temps per confirmar, dins l’assistent de WhatsApp.',cov:'Missatges d’avís i manteniment.',sv:'Trucar clients en espera i tornar a omplir taules'},
+      {n:'Carta digital QR en 4 idiomes',t:C,p:240,q:26,ext:5,mm:20,h:1,w:6,inc:'Carta amb traduccions (català, castellà, anglès i francès), al·lèrgens, plat del dia i «esgotat»; QR per a les taules dels dos locals.',cov:'Allotjament de la carta i canvis de plats i preus.',sv:'Explicar plats i al·lèrgens i canviar cartes impreses'},
+      {n:'Respostes a ressenyes de Google',t:M,p:200,q:31,ext:10,mm:20,h:3,w:5,inc:'Guia de to amb 20–30 exemples, model de resposta per a cada tipus de ressenya, connexió amb Google Business Profile dels dos locals i aprovació des del panell.',cov:'Ús d’IA i millora del to amb les vostres correccions.',sv:'Llegir i contestar ressenyes una a una'},
+      {n:'Web de reserves i esdeveniments',t:M,p:1200,q:31,ext:10,mm:20,h:2,w:30,inc:'Disseny propi amb la imatge de Bar Bocata, 4 idiomes, agenda de partits, vermuts i nits temàtiques, sol·licituds de grups i reserva directa connectada al panell.',cov:'Allotjament, domini i altes d’esdeveniments.',sv:'Atendre per telèfon consultes d’esdeveniments i grups'},
       {n:'Formació inicial i revisió',t:M,p:320,q:0,h:0,w:8,inc:'Sessions amb l’equip de cada local, guia d’ús i reunió de revisió amb resultats (4 de desembre).'}
     ]}
   ];
   var TAR=40, DESC0=0.5, MG=0.1, MG0=0.1, PH=P[0];
-  PH.s.forEach(function(x){x.ext=x.ext||0;x.mh=x.mh||0;x.w0=x.w;x.e0=x.ext;x.m0=x.mh;});
+  PH.s.forEach(function(x){x.ext=x.ext||0;x.mm=x.mm||0;x.w0=x.w;x.e0=x.ext;x.m0=x.mm;});
   var KEY='bb-pressupost-f1-v1';
-  try{var st=JSON.parse(localStorage.getItem(KEY)||'null'); if(st){ if(typeof st.d==='number') DESC=st.d; if(typeof st.mg==='number') MG=st.mg; PH.s.forEach(function(x,i){if(st.w&&typeof st.w[i]==='number') x.w=st.w[i]; if(st.e&&typeof st.e[i]==='number') x.ext=st.e[i]; if(st.m&&typeof st.m[i]==='number') x.mh=st.m[i];}); }}catch(e){}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify({d:DESC,mg:MG,w:PH.s.map(function(x){return x.w;}),e:PH.s.map(function(x){return x.ext;}),m:PH.s.map(function(x){return x.mh;})}));}catch(e){}}
+  try{var st=JSON.parse(localStorage.getItem(KEY)||'null'); if(st){ if(typeof st.d==='number') DESC=st.d; if(typeof st.mg==='number') MG=st.mg; PH.s.forEach(function(x,i){if(st.w&&typeof st.w[i]==='number') x.w=st.w[i]; if(st.e&&typeof st.e[i]==='number') x.ext=st.e[i]; if(st.mm&&typeof st.mm[i]==='number') x.mm=st.mm[i];}); }}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify({d:DESC,mg:MG,w:PH.s.map(function(x){return x.w;}),e:PH.s.map(function(x){return x.ext;}),mm:PH.s.map(function(x){return x.mm;})}));}catch(e){}}
   function price(x){return Math.round(x.w*TAR/10)*10;}
-  function quota(x){return Math.round(Math.round((x.ext*(1+MG)+x.mh*TAR)*100)/100);}
+  function quota(x){return Math.round(Math.round((x.ext*(1+MG)+x.mm)*100)/100);}
   function num(v,d){var s=(Math.round(v*Math.pow(10,d||0))/Math.pow(10,d||0)).toFixed(d||0).split('.');s[0]=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,'.');return s.join(',');}
   function E(v){return num(v)+' €';}
   function hrs(v){return num(v,1).replace(/,0$/,'');}
   function calc(){
-    var r={list:0,q:0,h:0,val:0,w:0,ext:0,mh:0,mq:0};
-    PH.s.forEach(function(x){x.p=price(x);x.q=quota(x);x.mq=x.mh*TAR;x.eq=x.q-x.mq;r.ext+=x.eq;r.mh+=x.mh;r.mq+=x.mq;r.list+=x.p;r.q+=x.q;r.h+=x.h;r.w+=x.w;r.val+=Math.round(x.h*SEM*VH);});
+    var r={list:0,q:0,h:0,val:0,w:0,ext:0,mq:0};
+    PH.s.forEach(function(x){x.p=price(x);x.q=quota(x);x.mq=x.mm;x.eq=x.q-x.mq;r.ext+=x.eq;r.mq+=x.mq;r.list+=x.p;r.q+=x.q;r.h+=x.h;r.w+=x.w;r.val+=Math.round(x.h*SEM*VH);});
     r.desc=Math.round(r.list*DESC); r.net=r.list-r.desc; r.iva=Math.round(r.net*IVA); r.netIva=r.net+r.iva;
     r.qIva=Math.round(r.q*(1+IVA)); r.save=r.val-r.q; r.pb=r.save>0?r.net/r.save:null;
     return r;
@@ -910,7 +910,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
       b.querySelector('b').textContent=x.n;
       var d=el('div','svc-d'); d.id=id; d.hidden=!o;
       d.innerHTML='<p><b>Què inclou.</b> <span class="a"></span> <span class="note-i">Unes '+hrs(x.w)+' h de feina.</span></p>'+
-        (x.q?'<p><b>La quota cobreix.</b> <span class="b"></span> <span class="note-i">'+E(x.eq)+' de costos externs + '+E(x.mq)+' de manteniment ('+hrs(x.mh)+' h/mes).</span></p>':'<p class="muted">Pagament únic, sense quota mensual.</p>')+
+        (x.q?'<p><b>La quota cobreix.</b> <span class="b"></span> <span class="note-i">'+E(x.eq)+' de costos externs + '+E(x.mq)+' de manteniment i suport.</span></p>':'<p class="muted">Pagament únic, sense quota mensual.</p>')+
         (x.sv?'<p class="sv"><b>Hores que estalvia:</b> <span class="c"></span></p>':'');
       d.querySelector('.a').textContent=x.inc; if(x.q) d.querySelector('.b').textContent=x.cov||'';
       if(x.sv) d.querySelector('.c').textContent=x.h+' h a la setmana. '+x.sv+'.';
@@ -931,14 +931,14 @@ input[type=range]{width:100%;accent-color:var(--red)}
   });
   var qRows=$('ed-qrows');
   PH.s.forEach(function(x,j){
-    if(!x.q && !x.ext && !x.mh && !x.cov) return;
-    var row=el('div','ed-r qx','<label></label><input type="number" min="0" max="2000" step="1" inputmode="decimal" class="e"><input type="number" min="0" max="100" step="0.25" inputmode="decimal" class="m"><b></b>');
+    if(!x.q && !x.ext && !x.mm && !x.cov) return;
+    var row=el('div','ed-r qx','<label></label><input type="number" min="0" max="2000" step="1" inputmode="decimal" class="e"><input type="number" min="0" max="2000" step="5" inputmode="decimal" class="m"><b></b>');
     row.querySelector('label').textContent=x.n; row.querySelector('label').htmlFor='ede-'+j;
     var ie=row.querySelector('.e'), im=row.querySelector('.m'); ie.id='ede-'+j; im.id='edm-'+j;
-    ie.setAttribute('aria-label',x.n+': costos externs al mes'); im.setAttribute('aria-label',x.n+': hores de manteniment al mes');
+    ie.setAttribute('aria-label',x.n+': costos externs al mes'); im.setAttribute('aria-label',x.n+': manteniment i suport al mes en euros');
     function rd(inp){var v=parseFloat(String(inp.value).replace(',','.'));return isFinite(v)&&v>=0?v:0;}
     ie.addEventListener('input',function(){x.ext=rd(ie);save();renderAll();});
-    im.addEventListener('input',function(){x.mh=rd(im);save();renderAll();});
+    im.addEventListener('input',function(){x.mm=rd(im);save();renderAll();});
     qRows.appendChild(row);
   });
   $('ed-m').addEventListener('input',function(){MG=this.value/100;save();renderAll();});
@@ -946,7 +946,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
   function setEdit(on){$('ed').hidden=!on;$('f0-list').hidden=on;$('ed-tg').setAttribute('aria-expanded',on);$('ed-tg').textContent=on?'Veure els serveis':'Ajustar el pressupost';}
   $('ed-tg').addEventListener('click',function(){setEdit($('ed').hidden);});
   $('ed-ok').addEventListener('click',function(){setEdit(false);});
-  $('ed-reset').addEventListener('click',function(){DESC=DESC0;MG=MG0;PH.s.forEach(function(x,j){x.w=x.w0;x.ext=x.e0;x.mh=x.m0;});save();renderAll(true);});
+  $('ed-reset').addEventListener('click',function(){DESC=DESC0;MG=MG0;PH.s.forEach(function(x,j){x.w=x.w0;x.ext=x.e0;x.mm=x.m0;});save();renderAll(true);});
   $('mq-ed').addEventListener('click',function(){go('fase1');setEdit(true);setTimeout(function(){$('ed-qh').scrollIntoView({block:'start',behavior:reduce?'auto':'smooth'});},60);});
   function renderMonthly(r){
     $('mq-sum').innerHTML='<div class="pk main" style="background:var(--c-res);border-color:var(--c-res)"><span>Quota mensual (sense IVA)</span><b>'+E(r.q)+'</b></div>'+
@@ -955,7 +955,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
     $('mq-mg').textContent=num(MG*100)+' % de marge';
     var h='<div class="svc-h qx"><span>Servei</span><span>Costos externs</span><span>Manteniment</span><span>Quota</span></div>';
     PH.s.forEach(function(x){ if(!x.q) return;
-      h+='<div class="svc qx nb"><span class="sn"><b>'+x.n+'</b></span><span class="v">'+E(x.eq)+'</span><span class="v">'+E(x.mq)+'<small> · '+hrs(x.mh)+' h</small></span><span class="v"><b>'+E(x.q)+'</b></span></div>';
+      h+='<div class="svc qx nb"><span class="sn"><b>'+x.n+'</b></span><span class="v">'+E(x.eq)+'</span><span class="v">'+E(x.mq)+'</span><span class="v"><b>'+E(x.q)+'</b></span></div>';
     });
     h+='<div class="svc-t qx"><span>Total al mes</span><span class="v">'+E(r.ext)+'</span><span class="v">'+E(r.mq)+'</span><span class="v">'+E(r.q)+'</span></div>';
     $('mq-list').innerHTML=h;
@@ -963,9 +963,9 @@ input[type=range]{width:100%;accent-color:var(--red)}
   function renderEdit(r,force){
     $('ed-d').value=Math.round(DESC*100); $('ed-d-o').textContent=pct();
     PH.s.forEach(function(x,j){var inp=$('edw-'+j); if(force||document.activeElement!==inp) inp.value=x.w; inp.parentNode.querySelector('b').textContent=E(x.p);
-      var ie=$('ede-'+j), im=$('edm-'+j); if(ie){ if(force||document.activeElement!==ie) ie.value=x.ext; if(force||document.activeElement!==im) im.value=x.mh; ie.parentNode.querySelector('b').textContent=E(x.q);} });
+      var ie=$('ede-'+j), im=$('edm-'+j); if(ie){ if(force||document.activeElement!==ie) ie.value=x.ext; if(force||document.activeElement!==im) im.value=x.mm; ie.parentNode.querySelector('b').textContent=E(x.q);} });
     $('ed-m').value=Math.round(MG*100); $('ed-m-o').textContent=num(MG*100)+' %';
-    $('ed-te').textContent=E(PH.s.reduce(function(a,x){return a+x.ext;},0)); $('ed-tm').textContent=hrs(r.mh)+' h'; $('ed-tq').textContent=E(r.q);
+    $('ed-te').textContent=E(PH.s.reduce(function(a,x){return a+x.ext;},0)); $('ed-tm').textContent=E(r.mq); $('ed-tq').textContent=E(r.q);
     $('ed-th').textContent=hrs(r.w)+' h'; $('ed-tp').textContent=E(r.list);
   }
 
