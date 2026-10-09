@@ -748,7 +748,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
             <div><b id="t-h">0 h</b><span>liberadas a la semana</span></div>
           </div>
           <p class="note" id="t-val" style="margin:0"></p>
-          <p class="note" style="margin:0">Precios orientativos sin IVA para los dos locales.</p>
+          <p class="note" style="margin:0">Precios sin IVA para los dos locales. Las fases 2 y 3 se presupuestan en detalle al terminar la fase anterior.</p>
         </div>
       </div>
     </section>
@@ -1164,35 +1164,60 @@ input[type=range]{width:100%;accent-color:var(--red)}
     b.addEventListener('click',function(){press(steps,b);$('stepx').textContent=s[3];});steps.appendChild(b);});
   $('stepx').textContent=ST[0][3];
 
-  /* 14. Builder */
-  var sel={}, PRE={'Básico':['wa','alg','rsp'],'Recomendado':['wa','esp','alg','alb','esc','rsp'],'Completo':S.map(function(s){return s.id;})};
-  PRE['Recomendado'].forEach(function(id){sel[id]=true;});
+  /* 14. Builder: services, prices and phases from the budget (prices without VAT) */
+  var DSC=0.5;
+  function fe(v){return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €';}
+  var BPH={f1:{n:'Fase 1 · El panel y el cliente',c:'var(--red)'},f2:{n:'Fase 2 · Cocina y compras',c:'var(--c-coc)'},f3:{n:'Fase 3 · El resto, a medida',c:'var(--c-eq)'}};
+  var BS=[
+    {id:'b-diag',a:'f1',n:'Diagnóstico y gestión del proyecto',alta:280,mes:0,h:0},
+    {id:'b-panel',a:'f1',n:'Panel de control',alta:600,mes:47,h:1},
+    {id:'b-wa',a:'f1',n:'Reservas por WhatsApp',alta:640,mes:80,h:7},
+    {id:'b-esp',a:'f1',n:'Lista de espera y mesas liberadas',alta:120,mes:16,h:2},
+    {id:'b-qr',a:'f1',n:'Carta digital QR en 4 idiomas',alta:240,mes:26,h:1},
+    {id:'b-rsp',a:'f1',n:'Respuestas a reseñas de Google',alta:200,mes:31,h:3},
+    {id:'b-webr',a:'f1',n:'Web de reservas y eventos',alta:1200,mes:31,h:2},
+    {id:'b-fi',a:'f1',n:'Formación inicial y revisión',alta:320,mes:0,h:0},
+    {id:'b-alb',a:'f2',n:'Lectura de albaranes y facturas',alta:440,mes:48,h:4},
+    {id:'b-esc',a:'f2',n:'Escandallos con alerta de margen',alta:320,mes:26,h:2},
+    {id:'b-pro',a:'f2',n:'Producción y pedidos sugeridos',alta:320,mes:31,h:2},
+    {id:'b-mer',a:'f2',n:'Registro de mermas',alta:120,mes:13,h:1},
+    {id:'b-ing',a:'f3',n:'Análisis de carta por margen',alta:380,mes:0,h:0},
+    {id:'b-sug',a:'f3',n:'Venta sugerida de platos y postres',alta:160,mes:13,h:0},
+    {id:'b-grp',a:'f3',n:'Grupos y comidas de empresa',alta:200,mes:16,h:2},
+    {id:'b-tur',a:'f3',n:'Previsión de clientes y turnos',alta:320,mes:31,h:3},
+    {id:'b-appcc',a:'f3',n:'Asistente de cocina y APPCC',alta:240,mes:21,h:1},
+    {id:'b-inf',a:'f3',n:'Informe mensual de opiniones',alta:120,mes:16,h:1},
+    {id:'b-fa',a:'f3',n:'Formación del equipo (avanzada)',alta:480,mes:0,h:0}
+  ];
+  var sel={}, PRE={'Fase 1':['f1'],'Fases 1 y 2':['f1', 'f2'],'Todas las fases':['f1', 'f2', 'f3']};
+  function selPhases(ps){sel={};BS.forEach(function(s){if(ps.indexOf(s.a)>=0) sel[s.id]=true;});}
+  selPhases(PRE['Fase 1']);
   var opts=$('opts');
-  Object.keys(AREAS).forEach(function(k){
-    var g=el('div','og'); g.style.setProperty('--c',AREAS[k].c); var h3=el('h3','','<i></i><span></span>'); h3.lastChild.textContent=AREAS[k].n; g.appendChild(h3);
-    S.filter(function(s){return s.a===k;}).forEach(function(s){
+  Object.keys(BPH).forEach(function(k){
+    var g=el('div','og'); g.style.setProperty('--c',BPH[k].c); var h3=el('h3','','<i></i><span></span>'); h3.lastChild.textContent=BPH[k].n; g.appendChild(h3);
+    BS.filter(function(s){return s.a===k;}).forEach(function(s){
       var l=el('label','opt','<input type="checkbox"><span></span><small></small>'); var cb=l.querySelector('input');
-      cb.id='opt-'+s.id; cb.checked=!!sel[s.id]; l.children[1].textContent=s.n; l.children[2].textContent=s.mes?eur(s.mes)+'/mes':eur(s.alta);
+      cb.id='opt-'+s.id; cb.checked=!!sel[s.id]; l.children[1].textContent=s.n; l.children[2].textContent=fe(s.alta)+(s.mes?' + '+fe(s.mes)+'/mes':'');
       cb.addEventListener('change',function(){sel[s.id]=cb.checked;build(s.id);}); g.appendChild(l);
     });
     opts.appendChild(g);
   });
   var pre=$('presets');
-  Object.keys(PRE).forEach(function(k){var b=el('button','chip');b.type='button';b.textContent=k;b.setAttribute('aria-pressed',k==='Recomendado');
-    b.addEventListener('click',function(){press(pre,b);sel={};PRE[k].forEach(function(id){sel[id]=true;});S.forEach(function(s){$('opt-'+s.id).checked=!!sel[s.id];});build();});pre.appendChild(b);});
-  function totals(){var c=S.filter(function(s){return sel[s.id];});return {alta:c.reduce(function(a,s){return a+s.alta;},0),mes:c.reduce(function(a,s){return a+s.mes;},0),h:c.reduce(function(a,s){return a+s.h;},0),c:c};}
+  Object.keys(PRE).forEach(function(k){var b=el('button','chip');b.type='button';b.textContent=k;b.setAttribute('aria-pressed',k==='Fase 1');
+    b.addEventListener('click',function(){press(pre,b);selPhases(PRE[k]);BS.forEach(function(s){$('opt-'+s.id).checked=!!sel[s.id];});build();});pre.appendChild(b);});
+  function totals(){var c=BS.filter(function(s){return sel[s.id];});var t={alta:c.reduce(function(a,s){return a+s.alta;},0),mes:c.reduce(function(a,s){return a+s.mes;},0),h:c.reduce(function(a,s){return a+s.h;},0),c:c};t.desc=Math.round(t.alta*DSC);t.net=t.alta-t.desc;return t;}
   function build(added){
     if(added!==undefined) [].forEach.call(pre.children,function(b){b.setAttribute('aria-pressed','false');});
     var t=totals(), lines=$('b-lines'); lines.innerHTML='';
     if(!t.c.length) lines.appendChild(el('div','empty-b','Elegid al menos un servicio'));
-    t.c.forEach(function(s){var l=el('div','tl','<i></i><span></span><small></small>');l.style.setProperty('--c',AREAS[s.a].c);l.children[1].textContent=s.n;l.children[2].textContent=s.mes?eur(s.mes):'único';if(s.id===added) l.classList.add('pop');lines.appendChild(l);});
-    $('b-n').textContent=t.c.length+(t.c.length===1?' servicio':' servicios'); $('b-mes').textContent=eur(t.mes);
-    $('t-alta').textContent=eur(t.alta); $('t-mes').textContent=eur(t.mes); $('t-h').textContent=t.h+' h';
-    $('t-val').textContent=t.h?'Unas '+Math.round(t.h*4.33)+' horas al mes, que a 15 €/h equivalen a unos '+eur(Math.round(t.h*4.33*15/10)*10)+' de tiempo del equipo.':'';
+    t.c.forEach(function(s){var l=el('div','tl','<i></i><span></span><small></small>');l.style.setProperty('--c',BPH[s.a].c);l.children[1].textContent=s.n;l.children[2].textContent=s.mes?fe(s.mes):'único';if(s.id===added) l.classList.add('pop');lines.appendChild(l);});
+    $('b-n').textContent=t.c.length+(t.c.length===1?' servicio':' servicios'); $('b-mes').textContent=fe(t.mes);
+    $('t-alta').textContent=fe(t.net); $('t-mes').textContent=fe(t.mes); $('t-h').textContent=t.h+' h';
+    $('t-val').textContent=(t.h?'Unas '+Math.round(t.h*4.33)+' horas al mes, que a 15 €/h equivalen a unos '+fe(Math.round(t.h*4.33*15/10)*10)+' de tiempo del equipo.':'')+(t.desc?' '+'Incluye un descuento del '+Math.round(DSC*100)+' % sobre la puesta en marcha (precio sin descuento: '+fe(t.alta)+').':'');
     var l2=$('sum-list'); l2.innerHTML='';
     if(!t.c.length) l2.appendChild(el('p','note','Todavía no habéis elegido servicios.'));
-    t.c.forEach(function(s){var r=el('div','it','<span></span><span></span>');r.children[0].textContent=s.n;r.children[1].textContent=s.mes?eur(s.alta)+' + '+eur(s.mes)+'/mes':eur(s.alta);l2.appendChild(r);});
-    $('s-alta').textContent=eur(t.alta); $('s-mes').textContent=eur(t.mes); $('s-h').textContent=t.h+' h';
+    t.c.forEach(function(s){var r=el('div','it','<span></span><span></span>');r.children[0].textContent=s.n;r.children[1].textContent=s.mes?fe(s.alta)+' + '+fe(s.mes)+'/mes':fe(s.alta);l2.appendChild(r);});
+    $('s-alta').textContent=fe(t.net); $('s-mes').textContent=fe(t.mes); $('s-h').textContent=t.h+' h';
   }
   build();
 
@@ -1205,7 +1230,7 @@ input[type=range]{width:100%;accent-color:var(--red)}
   $('copy-sum').addEventListener('click',function(){
     var t=totals();
     copy('Propuesta de IA para Bar Bocata\n\n'+t.c.map(function(s){return '- '+s.n;}).join('\n')+
-      '\n\nPuesta en marcha: '+eur(t.alta)+'\nCuota mensual: '+eur(t.mes)+'\nHoras liberadas: '+t.h+' h a la semana\n\nPrecios orientativos sin IVA para los dos locales. Primer paso: una semana de diagnóstico en Travessera y Diagonal.','Resumen copiado');
+      '\n\nPuesta en marcha: '+fe(t.net)+' (descuento del '+Math.round(DSC*100)+' % incluido; sin descuento, '+fe(t.alta)+')\nCuota mensual: '+fe(t.mes)+'\nHoras liberadas: '+t.h+' h a la semana\n\nPrecios sin IVA para los dos locales. Primer paso: una semana de diagnóstico en Travessera y Diagonal.','Resumen copiado');
   });
   $('copy-mail').addEventListener('click',function(){copy($('mail').textContent,'Correo copiado');});
 
